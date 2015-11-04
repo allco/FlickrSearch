@@ -8,8 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 
 /**
  * Main activity.
@@ -20,8 +18,13 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		/*if (BuildConfig.DEBUG) {
+			Picasso.with(this).setIndicatorsEnabled(true);
+		}*/
 
 		// set up toolbar
 		final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
 			@Override
 			public boolean onQueryTextSubmit(String query) {
+
 				if (!isSearchRequestApplicable(query)) return true;
 				showSubmitButton(false);
 				searchView.clearFocus();
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 			 * @param show - true if show
 			 */
 			private void showSubmitButton(boolean show) {
+
 				if (show == isSubmitVisible) return;
 				isSubmitVisible = show;
 				searchView.setSubmitButtonEnabled(isSubmitVisible);
@@ -65,12 +70,13 @@ public class MainActivity extends AppCompatActivity {
 		searchView.post(new Runnable() {
 			@Override
 			public void run() {
+
 				searchView.clearFocus();
 			}
 		});
 
 		// create initial instance of NewsFragment
-		PhotoListFragment photoListFragment = getCurrentNewsFragment();
+		PhotoListFragment photoListFragment = getCurrentPhotosFragment();
 		if (photoListFragment == null) {
 			replaceFragment(PhotoListFragment.newInstance(null), false);
 		}
@@ -79,8 +85,10 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * @return current NewsFragment instance if it exists else null
 	 */
-	public  @Nullable
-	PhotoListFragment getCurrentNewsFragment() {
+	public
+	@Nullable
+	PhotoListFragment getCurrentPhotosFragment() {
+
 		Fragment fragmentById = getSupportFragmentManager().findFragmentById(R.id.fr_list);
 		if (!(fragmentById instanceof PhotoListFragment)) return null;
 		return (PhotoListFragment) fragmentById;
@@ -92,18 +100,21 @@ public class MainActivity extends AppCompatActivity {
 	 * (stored at current NewsFragment)
 	 */
 	private boolean isSearchRequestApplicable(String request) {
+
 		if (TextUtils.isEmpty(request)) return false;
 
-		PhotoListFragment photoListFragment = getCurrentNewsFragment();
+		PhotoListFragment photoListFragment = getCurrentPhotosFragment();
 		String currentRequest = photoListFragment == null ? null : photoListFragment.getSearchRequest();
 		return currentRequest == null || !currentRequest.equals(request);
 	}
 
 	/**
 	 * Update text at searchView
+	 *
 	 * @param request - string that should replace the current one
 	 */
 	public void setSearchRequest(String request) {
+
 		if (searchView == null) return;
 		searchView.setQuery(request, false);
 		searchView.clearFocus();
@@ -111,10 +122,12 @@ public class MainActivity extends AppCompatActivity {
 
 	/**
 	 * Add new fragment to Fragment manager and remove previous
-	 * @param fragment a new fragment
+	 *
+	 * @param fragment   a new fragment
 	 * @param addToStack if true then transactions will be added to backStack
 	 */
 	private void replaceFragment(Fragment fragment, boolean addToStack) {
+
 		if (fragment == null) return;
 
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -128,24 +141,4 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_mian, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-
-		//noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 }
