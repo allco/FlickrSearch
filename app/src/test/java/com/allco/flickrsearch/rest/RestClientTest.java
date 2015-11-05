@@ -114,7 +114,7 @@ public class RestClientTest {
 
 		// create restClient
 		RestClient restClient = RestClient.Factory.getRestClient(null);
-		assertThat("restClinet is created", restClientm, notNullValue());
+		assertThat("restClinet is created", restClient, notNullValue());
 
 		// create a flickr request
 		Call<FlickrModel> request = restClient.createCallFlickrSearch("request", 0, 0, false);
