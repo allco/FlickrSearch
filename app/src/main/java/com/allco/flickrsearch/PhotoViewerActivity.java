@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import static com.allco.flickrsearch.utils.Preconditions.checkArgumentNotNull;
-import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
+import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkArgument;
+import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
 
 public class PhotoViewerActivity extends AppCompatActivity {
 
@@ -24,15 +24,17 @@ public class PhotoViewerActivity extends AppCompatActivity {
 
 	public static void start(Context ctx, String title, String url) {
 
-		checkArgumentNotNull(ctx);
-		checkArgumentNotNull(url);
-		checkArgumentNotNull(title);
+		checkArgument(ctx != null);
+		checkArgument(url != null);
+		checkArgument(title != null);
 
 		Intent intent = new Intent(ctx, PhotoViewerActivity.class);
 		intent.putExtra(ARG_IMAGE_URL, url);
 		intent.putExtra(ARG_IMAGE_TITLE, title);
 
-		ctx.startActivity(intent);
+		if (ctx != null) {
+			ctx.startActivity(intent);
+		}
 	}
 
 	@Override

@@ -15,12 +15,12 @@ import android.widget.ListView;
 
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 
-import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
+import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
 
 /**
  * Shows the result of search at Flickr with given request string.
  */
-public class PhotoListFragment extends ListFragment implements PhotoListAdapter.Listener {
+public class PhotoListFragment extends ListFragment implements PhotoListAdapter.Listener, IdlingProvider {
 
 	private final static String ARG_SEARCH_REQ = "ARG_SEARCH_REQ";
 	private String searchRequest;
@@ -227,5 +227,15 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 			listAdapter.reset(searchRequest, false);
 			tryResetMainActivity();
 		}
+	}
+
+	/**
+	 * Implementation of IdlingProvider's method.
+	 *
+	 * @return true if some async processes in progress at this moment
+	 */
+	@Override public boolean isIdleNow() {
+
+		return listAdapter == null || listAdapter.isIdleNow();
 	}
 }
