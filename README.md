@@ -55,6 +55,3 @@ Run command (do not forget setup ANDROID_HOME environment variable):
 * JUnit4 http://junit.org/
 * Hamcrest http://hamcrest.org/
 * MockWebServer https://github.com/square/okhttp/tree/master/mockwebserver
-
-Road map:
-* tune up travis-ci
