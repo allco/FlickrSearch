@@ -15,7 +15,7 @@ import android.widget.ListView;
 
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
+import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
 
 /**
  * Shows the result of search at Flickr with given request string.

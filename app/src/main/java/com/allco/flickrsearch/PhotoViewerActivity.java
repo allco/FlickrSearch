@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkArgument;
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
+import static com.allco.flickrsearch.utils.Preconditions.checkArgument;
+import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
 
 /**
  * Activity that implements Entry viewer

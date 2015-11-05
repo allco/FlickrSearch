@@ -122,12 +122,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.android.support:design:23.1.0'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:design:23.0.1'
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
-
-    compile 'com.android.support.test.espresso:espresso-core:2.2.1'
 
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
@@ -139,7 +137,8 @@ dependencies {
 
     androidTestCompile 'com.android.support.test:runner:0.4'
     androidTestCompile 'com.android.support.test:rules:0.4'
+    //compile 'com.android.support:support-annotations:23.1.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
-    androidTestCompile 'com.android.support:support-annotations:23.1.0'
+
     androidTestCompile 'com.squareup.okhttp:mockwebserver:2.5.0'
 }

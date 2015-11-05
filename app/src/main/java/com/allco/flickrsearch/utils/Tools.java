@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.text.Html;
 
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
+import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
 
 /**
  * Container for utils

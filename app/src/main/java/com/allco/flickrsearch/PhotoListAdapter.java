@@ -25,9 +25,9 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkArgument;
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
-import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkState;
+import static com.allco.flickrsearch.utils.Preconditions.checkArgument;
+import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
+import static com.allco.flickrsearch.utils.Preconditions.checkState;
 
 /**
  * Adapter for store and handling data received from Flickr.
