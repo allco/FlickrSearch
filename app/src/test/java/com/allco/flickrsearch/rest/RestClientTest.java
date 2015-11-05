@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class RestClientTest {
 
+	// JSON preset fot Tests
 	private static final String JSON_PRESET =
 			"{\n"+
 			"\"photos\":{\n"+
@@ -70,8 +71,14 @@ public class RestClientTest {
 
 
 
+	// a local Web-server
 	private MockWebServer server;
 
+	/**
+	 * Initialize environment before execution of each Test
+	 *
+	 * @throws IOException
+	 */
 	@Before
 	public void setUp() throws IOException {
 		server = new MockWebServer();
@@ -80,6 +87,11 @@ public class RestClientTest {
 		RestClient.Factory.enableTestCase(server.url("/").toString());
 	}
 
+	/**
+	 * Cleanup after each Test
+	 *
+	 * @throws IOException
+	 */
 	@After
 	public void tearOff() throws IOException {
 
@@ -87,30 +99,53 @@ public class RestClientTest {
 		server = null;
 	}
 
-
+	/**
+	 * The Test will be passed if:
+	 * 1. {@link com.allco.flickrsearch.rest.RestClient} is created.
+	 * 2. Request executed
+	 * 3. Data received and successfully parsed
+	 *
+	 * @throws Exception
+	 */
 	@Test
-	public void testGetGoogleNewsService() throws Exception {
+	public void test_flickr_service() throws Exception {
 
 		System.out.println(JSON_PRESET);
 
+		// create restClient
 		RestClient restClient = RestClient.Factory.getRestClient(null);
+		assertThat("restClinet is created", restClientm, notNullValue());
+
+		// create a flickr request
 		Call<FlickrModel> request = restClient.createCallFlickrSearch("request", 0, 0, false);
+		// perform the request
 		Response<FlickrModel> response = request.execute();
 
+		// response should be valid
 		assertThat("response != null", response, notNullValue());
 		assertThat("response is 200", response.code(), is(200));
 
+		// reponse should contain valid body
 		FlickrModel model = response.body();
 		assertThat("model != null", model, notNullValue());
 
+		// body should contain valid list of entries
 		List<FlickrModel.Entry> entries = model.getEntries();
 		assertThat("entries != null", entries, notNullValue());
 		assertThat("entries.size()", entries, IsCollectionWithSize.hasSize(3));
 
+		// each entry should be valid too
 		checkEntry(entries, 0);
 		checkEntry(entries, 1);
+		checkEntry(entries, 2);
 	}
 
+	/**
+	 * Check validity of entry at position {@code index}
+	 *
+	 * @param entries list entries
+	 * @param index position of entry for check
+	 */
 	private void checkEntry(List<FlickrModel.Entry> entries, int index) {
 		FlickrModel.Entry entry = entries.get(index);
 		assertThat("entry != null " + index, entry, notNullValue());

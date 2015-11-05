@@ -22,10 +22,12 @@ import retrofit.Retrofit;
 public class RestClient {
 	static private final String BASE_URL_FLICKR = "https://api.flickr.com";
 
-	public static final int CACHE_MAX_SIZE = 10 * 1024 * 1024;
-
-	public static final int CACHE_EXPIRATION_TIME = 3600; // in seconds
-	public static final int CACHE_STALE_TOLERANCE = 60 * 60 * 24 * 28;
+	// size of disk cache for HTTP responses
+	public static final int CACHE_MAX_SIZE = 10 * 1024 * 1024; // 10 Mb
+	// cache expiration time for online mode, in seconds
+	public static final int CACHE_EXPIRATION_TIME = 60 * 60; // 1 hour
+	// cache expiration time for offline mode, in seconds
+	public static final int CACHE_STALE_TOLERANCE = 60 * 60 * 24; // 1 day
 
 	private FlickerSearchService flickrSearchService;
 	private Context ctx;
@@ -74,6 +76,12 @@ public class RestClient {
 
 	}
 
+	/**
+	 * Initializer for RestClient
+	 *
+	 * @param ctx Context
+	 * @param baseUrl url that will be used as end point
+	 */
 	private void tryInitialize(Context ctx, String baseUrl) {
 
 		if (flickrSearchService != null) return;
@@ -85,46 +93,67 @@ public class RestClient {
 		okHttpClient.setReadTimeout(30, TimeUnit.SECONDS);
 		okHttpClient.setConnectTimeout(30, TimeUnit.SECONDS);
 
-		addCache(okHttpClient);
+		// tune cache
+		enableCache(okHttpClient);
 
+		// create Retrofit object for farther services initialization
 		Retrofit retrofit = new Retrofit.Builder()
 				.addConverterFactory(GsonConverterFactory.create())
 				.baseUrl(baseUrl)
 				.client(okHttpClient)
 				.build();
 
-		// create Calls source
+		// create flickr service
 		flickrSearchService = retrofit.create(FlickerSearchService.class);
 
 	}
 
-	private void addCache(OkHttpClient okHttpClient) {
+	/**
+	 * Enable cache at underlay OkHttp client.
+	 * If {@link #ctx} is {@code null} the cache won't be enabled
+	 *
+	 * @param okHttpClient
+	 */
+	private void enableCache(OkHttpClient okHttpClient) {
 
 		if (ctx == null) return;
 
 		Cache cache = null;
 		try {
+			// get appropriate directory for cache
 			File externalCacheDir = ctx.getExternalCacheDir();
 			if (externalCacheDir == null) {
 				externalCacheDir = ctx.getCacheDir();
 			}
 			File httpCacheDirectory = new File(externalCacheDir, "responses");
+			// create cache
 			cache = new Cache(httpCacheDirectory, CACHE_MAX_SIZE);
 		} catch (Exception e) {
 			Log.e("OKHttp", "Could not create http cache", e);
 		}
 
+		// install cache to underlay OkHttp client
 		if (cache != null) {
 			okHttpClient.setCache(cache);
 		}
 	}
 
-
-
+	/**
+	 * Create flickr search request represented by {@link Call} object
+	 *
+	 * @param request a search request
+	 * @param pageNumber number of desired page
+	 * @param perPageCount maximum for amount of entries at one page
+	 * @param allowCache if {@code false} then using of network will be forced
+	 * @return {@link Call} object that represent the request
+	 */
 	public Call<FlickrModel> createCallFlickrSearch(String request, int pageNumber, int perPageCount, boolean allowCache) {
 
 		String cacheControl = "";
+		// if cache is fundamentally activated
 		if (ctx != null ) {
+			// if Internet connection is available
+			// use cache regards allowCache variable values
 			if (Tools.isNetworkAvailable(ctx)) {
 				cacheControl = "private, max-stale=" + (allowCache ? CACHE_EXPIRATION_TIME : 0);
 			} else {

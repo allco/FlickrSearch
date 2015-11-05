@@ -29,10 +29,10 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	private MenuItem menuItemRefresh;
 
 	/**
-	 * Factory method for NewsFragment
+	 * Factory method for PhotoListFragment
 	 *
-	 * @param searchRequest - string to request Google for news
-	 * @return constructed and prepared NewsFragment
+	 * @param searchRequest - a search request for Flickr
+	 * @return constructed and prepared PhotoListFragment
 	 */
 	public static PhotoListFragment newInstance(String searchRequest) {
 
@@ -67,11 +67,14 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 		}
 
 		//create and setup adapter
-		listAdapter = PhotoListAdapter.createNewsAdapter(getActivity(), this);
+		listAdapter = PhotoListAdapter.newInstance(getActivity(), this);
 		setListAdapter(listAdapter.reset(searchRequest, true));
 		setListShownNoAnimation(false);
 	}
 
+	/**
+	 * Try to setup search request to searchView of MainActivity
+	 */
 	private void tryResetMainActivity() {
 
 		Activity activity = getActivity();
@@ -83,17 +86,19 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	/**
 	 * Install given Adapter to underlined ListView
 	 *
-	 * @param adapter
+	 * @param adapter Adapter implementation
 	 */
 	@Override
 	public void setListAdapter(ListAdapter adapter) {
 
 		ListView listView = checkNotNull(getListView());
 
+		// if adapter handles scrolling
 		if (adapter instanceof AbsListView.OnScrollListener) {
 			listView.setOnScrollListener((AbsListView.OnScrollListener) adapter);
 		}
 
+		// add item appearing animation
 		if (adapter instanceof BaseAdapter) {
 			SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter((BaseAdapter) adapter);
 			animationAdapter.setAbsListView(listView);
@@ -115,6 +120,8 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		int id = item.getItemId();
+
+		// if refresh button pressed
 		if (id == R.id.action_refresh) {
 			refresh();
 			return true;
@@ -133,10 +140,10 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	}
 
 	/**
-	 * Implementation of NewsAdapter.Listener.
-	 * Called by NewsAdapter when next piece of result is loaded.
+	 * Implementation of PhotoListAdapter.Listener.
+	 * Called by PhotoListAdapter when next piece of result is loaded.
 	 *
-	 * @param adapter an instance of NewsAdapter that called this method
+	 * @param adapter an instance of PhotoListAdapter that called this method
 	 */
 	@Override
 	public void onPageLoaded(PhotoListAdapter adapter) {
@@ -152,10 +159,10 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	}
 
 	/**
-	 * Implementation of NewsAdapter.Listener.
-	 * Called by NewsAdapter when any error occurred.
+	 * Implementation of PhotoListAdapter.Listener.
+	 * Called by PhotoListAdapter when any error occurred.
 	 *
-	 * @param adapter an instance of NewsAdapter that called this method
+	 * @param adapter an instance of PhotoListAdapter that called this method
 	 */
 	@Override
 	public void onError(PhotoListAdapter adapter) {
@@ -219,7 +226,10 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 		return searchRequest;
 	}
 
-
+	/**
+	 * Refresh content.
+	 * Cache using will be forbidden
+	 */
 	public void refresh() {
 
 		if (listAdapter != null) {

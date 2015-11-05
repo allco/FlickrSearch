@@ -11,7 +11,7 @@ import android.text.TextUtils;
 
 /**
  * Main activity.
- * Handles all fragments and views.
+ * Handles all fragments with search results.
  */
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 	protected void onResume() {
 
 		// clear initial focus on searchView
-
 		searchView.post(new Runnable() {
 			@Override
 			public void run() {
@@ -55,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 		super.onResume();
 	}
 
+	/**
+	 * Called by {@link #searchView} when text is changing
+	 */
 	@Override
 	public boolean onQueryTextSubmit(String query) {
 
@@ -66,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 		return true;
 	}
 
+	/**
+	 * Called by {@link #searchView} when an user submits a search request
+	 */
 	@Override
 	public boolean onQueryTextChange(String newText) {
 		// search query is applicable than submit button will appear
@@ -97,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 	}
 
 	/**
-	 * @param request
+	 * @param request a search request
 	 * @return true if given request is not empty and is not equal to current request
 	 * (stored at current NewsFragment)
 	 */

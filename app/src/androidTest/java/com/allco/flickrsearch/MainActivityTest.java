@@ -30,6 +30,12 @@ public class MainActivityTest {
 	@Rule
 	public final ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
 
+	/**
+	 * The Test will be passed if:
+	 * All initial states of controls are valid
+	 *
+	 * @throws Throwable
+	 */
 	@Test
 	public void check_initialState() throws Exception {
 		// MainActivity should exist
@@ -48,6 +54,12 @@ public class MainActivityTest {
 		onView(isAssignableFrom(ListView.class)).check(matches(not(isDisplayed())));
 	}
 
+	/**
+	 * The Test will be passed if:
+	 * The 'Go button' is visible if request typed
+	 *
+	 * @throws Throwable
+	 */
 	@Test
 	public void searchViews_goButton_should_become_visible_only_if_request_typed() throws Throwable {
 

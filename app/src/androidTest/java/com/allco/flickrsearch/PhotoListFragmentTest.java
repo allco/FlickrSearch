@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.allco.flickrsearch.rest.RestClient;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
@@ -42,45 +43,45 @@ public class PhotoListFragmentTest {
 
 	// JSON preset fot Tests
 	private static final String JSON_PRESET =
-			"{\n"+
-			"\"photos\":{\n"+
-			"\"page\":1,\n"+
-			"\"pages\":96050,\n"+
-			"\"perpage\":10,\n"+
-			"\"total\":\"960492\",\n"+
-			"\"photo\":[\n"+
-			"{\n"+
-			"\"id\":\"22408121799\",\n"+
-			"\"owner\":\"133231929@N05\",\n"+
-			"\"secret\":\"5a41e793fc\",\n"+
-			"\"server\":\"5749\",\n"+
-			"\"farm\":6,\n"+
-			"\"title\":\"Next Launcher 3D Shell v3.7.3 APK Download | Android Pro Full Apk\",\n"+
-			"\"ispublic\":1,\n"+
-			"\"isfriend\":0,\n"+
-			"\"isfamily\":0\n"+
-			"},\n"+
-			"{\n"+
-			"\"id\":\"22811503261\",\n"+
-			"\"owner\":\"137223639@N03\",\n"+
-			"\"secret\":\"29ee7bc678\",\n"+
-			"\"server\":\"780\",\n"+
-			"\"farm\":1,\n"+
-			"\"title\":\"SNOWJINKS Android APK Free Download Game\",\n"+
-			"\"ispublic\":1,\n"+
-			"\"isfriend\":0,\n"+
-			"\"isfamily\":0\n"+
-			"},\n"+
-			"{\n"+
-			"\"id\":\"22800281525\",\n"+
-			"\"owner\":\"130367003@N05\",\n"+
-			"\"secret\":\"082a40ff4a\",\n"+
-			"\"server\":\"5652\",\n"+
-			"\"farm\":6,\n"+
-			"\"title\":\"Meizu Pro 5 Mini with Helio X20 SoC & 3GB RAM Listed Online For \\u20ac360 http:\\/\\/ift.tt\\/1kvryvk\",\n"+
-			"\"ispublic\":1,\n"+
-			"\"isfriend\":0,\n"+
-			"\"isfamily\":0\n"+
+			"{\n" +
+			"\"photos\":{\n" +
+			"\"page\":1,\n" +
+			"\"pages\":96050,\n" +
+			"\"perpage\":10,\n" +
+			"\"total\":\"960492\",\n" +
+			"\"photo\":[\n" +
+			"{\n" +
+			"\"id\":\"22408121799\",\n" +
+			"\"owner\":\"133231929@N05\",\n" +
+			"\"secret\":\"5a41e793fc\",\n" +
+			"\"server\":\"5749\",\n" +
+			"\"farm\":6,\n" +
+			"\"title\":\"Next Launcher 3D Shell v3.7.3 APK Download | Android Pro Full Apk\",\n" +
+			"\"ispublic\":1,\n" +
+			"\"isfriend\":0,\n" +
+			"\"isfamily\":0\n" +
+			"},\n" +
+			"{\n" +
+			"\"id\":\"22811503261\",\n" +
+			"\"owner\":\"137223639@N03\",\n" +
+			"\"secret\":\"29ee7bc678\",\n" +
+			"\"server\":\"780\",\n" +
+			"\"farm\":1,\n" +
+			"\"title\":\"SNOWJINKS Android APK Free Download Game\",\n" +
+			"\"ispublic\":1,\n" +
+			"\"isfriend\":0,\n" +
+			"\"isfamily\":0\n" +
+			"},\n" +
+			"{\n" +
+			"\"id\":\"22800281525\",\n" +
+			"\"owner\":\"130367003@N05\",\n" +
+			"\"secret\":\"082a40ff4a\",\n" +
+			"\"server\":\"5652\",\n" +
+			"\"farm\":6,\n" +
+			"\"title\":\"Meizu Pro 5 Mini with Helio X20 SoC & 3GB RAM Listed Online For \\u20ac360 http:\\/\\/ift.tt\\/1kvryvk\",\n" +
+			"\"ispublic\":1,\n" +
+			"\"isfriend\":0,\n" +
+			"\"isfamily\":0\n" +
 			"}" +
 			"]" +
 			"}" +
@@ -90,17 +91,28 @@ public class PhotoListFragmentTest {
 	@Rule
 	public final ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
 
-	// Mock for web server
+	// a local Web-server
 	private MockWebServer server;
 
+	/**
+	 * Initialize environment before execution of each Test
+	 *
+	 * @throws IOException
+	 */
 	@Before
 	public void setUp() throws IOException {
+
 		server = new MockWebServer();
 		server.start();
 		// Enable test case mode. Ever
 		RestClient.Factory.enableTestCase(server.url("/").toString());
 	}
 
+	/**
+	 * Cleanup after each Test
+	 *
+	 * @throws IOException
+	 */
 	@After
 	public void tearOff() throws IOException {
 
@@ -108,6 +120,13 @@ public class PhotoListFragmentTest {
 		server = null;
 	}
 
+	/**
+	 * Test will be passed if:
+	 * ListView is not visible and appropriate text message with explanation is shown
+	 * because HTTP_OK wasn't received.
+	 *
+	 * @throws Throwable
+	 */
 	@Test
 	public void check_error_received_from_server() throws Throwable {
 
@@ -123,6 +142,13 @@ public class PhotoListFragmentTest {
 		Espresso.unregisterIdlingResources(idlingResource);
 	}
 
+	/**
+	 * Test will be passed if:
+	 * ListView is not visible and appropriate text message with explanation is shown
+	 * because an invalid JSON is received.
+	 *
+	 * @throws Throwable
+	 */
 	@Test
 	public void check_empty_list_received_from_server() throws Throwable {
 
@@ -140,6 +166,12 @@ public class PhotoListFragmentTest {
 		Espresso.unregisterIdlingResources(idlingResource);
 	}
 
+	/**
+	 * Test will be passed if:
+	 * ListView is not empty because a valid JSON is received.
+	 *
+	 * @throws Throwable
+	 */
 	@Test
 	public void if_json_received_listView_should_be_non_empty() throws Throwable {
 
@@ -155,6 +187,12 @@ public class PhotoListFragmentTest {
 		Espresso.unregisterIdlingResources(idlingResource);
 	}
 
+	/**
+	 * Simulate user input in searchView request "test"
+	 *
+	 * @return {@code IdlingResource} that should be unregistered with {@code Espresso.unregisterIdlingResources(...)}
+	 * at the end of the test
+	 */
 	@NonNull
 	private IdlingResource simulateUserInputSearchRequest() {
 
@@ -168,16 +206,21 @@ public class PhotoListFragmentTest {
 		return new IdlingResourceImpl(mActivityRule.getActivity().getCurrentPhotosFragment());
 	}
 
-
+	/**
+	 * Custom matcher for AdapterView
+	 */
 	public static Matcher<View> notEmptyAdapterView() {
+
 		return new TypeSafeMatcher<View>() {
 			@Override
 			public void describeTo(Description description) {
+
 				description.appendText("has not empty adapter");
 			}
 
 			@Override
 			public boolean matchesSafely(View view) {
+
 				return view instanceof AdapterView && ((AdapterView) view).getCount() > 0;
 			}
 		};

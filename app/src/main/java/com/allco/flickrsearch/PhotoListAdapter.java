@@ -33,15 +33,17 @@ import static android.support.test.espresso.core.deps.guava.base.Preconditions.c
  * Adapter for store and handling data received from Flickr.
  * The first network request will be launched when {@link #reset(String,boolean)} will be called.
  * To load additional data the next network request will be instantiated when list item of type
- * ITEM_TYPE.PROGRESS will be created, and so on.
+ * ITEM_TYPE.PROGRESS is about to going to visible, and so on.
  * ITEM_TYPE.PROGRESS is won't be created when all data will be loaded or error occurs.
  */
 public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener, IdlingProvider {
 
+	// per page items count
 	public static final int PER_PAGE_COUNT = 10;
+	// limit fot total count of items
 	private static final int ITEMS_COUNT_LIMIT = 10000;
 	private final String TAG = this.getClass().getSimpleName();
-	// Represent current request to Google.
+	// Represent current request to Flickr.
 	// null when there is no active request at this moment.
 	private Call<FlickrModel> currentCall;
 	// The source of new currentCall.
@@ -55,11 +57,12 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	private ArrayList<FlickrModel.Entry> listEntries; // holder for news-items
 	private boolean isFinished = false; // true when all data pages is loaded or error occurred
 	private String request; // The search request.
-	private boolean allowCachedContent = true;
-	private int lastLoadedPageNumber;
+	private boolean allowCachedContent = true; // if false the no cache will be used
+	private int lastLoadedPageNumber = 0; // page number generator for requests
 
 
-	private enum ITEM_TYPE {REGULAR, PROGRESS} // type of view item
+	// type of view item
+	private enum ITEM_TYPE {REGULAR, PROGRESS}
 
 	/**
 	 * Should be implemented by clients.
@@ -88,7 +91,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	 * @param listener Implemented by Client instance of {@link Listener}
 	 * @return created instance of NewsAdapter
 	 */
-	public static PhotoListAdapter createNewsAdapter(Context ctx, Listener listener) {
+	public static PhotoListAdapter newInstance(Context ctx, Listener listener) {
 
 		// access restClient singleton - the network request handler
 		RestClient restClient = RestClient.Factory.getRestClient(ctx);
@@ -102,6 +105,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 		return new PhotoListAdapter(ctx, sizeThumbPixels, bitmapTransformer, restClient, listener);
 	}
 
+	// Constructor
 	private PhotoListAdapter(Context ctx, int sizeThumbPixels, BitmapBorderTransformer bitmapTransformer, RestClient restClient, Listener listener) {
 
 		checkArgument(sizeThumbPixels > 0);
@@ -149,10 +153,12 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 			currentCall = null;
 		}
 
+		// if restart clear page number counter
 		if (forceRestart){
 			lastLoadedPageNumber = 0;
 		}
 
+		// increase page number counter
 		lastLoadedPageNumber++;
 
 		// create new Call by restClient
@@ -236,10 +242,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 		notifyDataSetChanged();
 	}
 
-	/**
-	 * @param position interested items position
-	 * @return The item's url if it exist at given position
-	 *//*
+	/*
 	public String getItemUrl(int position) {
 
 		Object item = getItem(position);
@@ -247,12 +250,20 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 		return ((FlickrSearchResultModel.Photo) item).;
 	}*/
 
+	/**
+	 * @param position interested items position
+	 * @return The item's photo URL if it exist at given position
+	 */
 	public String getItemPhotoUrl(int position) {
 		Object item = getItem(position);
 		if (!(item instanceof FlickrModel.Entry)) return null;
 		return ((FlickrModel.Entry) item).getImageUrl();
 	}
 
+	/**
+	 * @param position interested items position
+	 * @return The item's Title if it exist at given position
+	 */
 	public String getItemTitle(int position) {
 		Object item = getItem(position);
 		if (!(item instanceof FlickrModel.Entry)) return null;
@@ -283,7 +294,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	}
 
 	/**
-	 * Create and tune item view for ListView which represents received item from Google
+	 * Create and tune item view for ListView which represents received item from Flickr
 	 *
 	 * @param position    position of interested item
 	 * @param convertView reusable view
@@ -292,14 +303,18 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	private View getRegularItemView(int position, View convertView) {
 
 		Holder h;
+		// View holder pattern implementation
 		if (convertView == null) {
 			convertView = View.inflate(ctx, R.layout.fragment_photos_list_item, null);
 			h = new Holder(convertView);
 		} else h = Holder.getHolder(convertView);
 
+		// data object
 		FlickrModel.Entry entry = listEntries.get(position);
+		// photo URL
 		String imageUrl = entry.getImageUrl();
 
+		// if URL exists, then load image
 		if (!TextUtils.isEmpty(imageUrl)) {
 
 			Picasso.with(ctx)
@@ -314,6 +329,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
 			h.icon.setVisibility(View.VISIBLE);
 		} else {
+			// or hide imageView
 			h.icon.setVisibility(View.INVISIBLE);
 		}
 
@@ -398,6 +414,9 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 		return 0;
 	}
 
+	/**
+	 * Stops image loading in scrolling process
+	 */
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 

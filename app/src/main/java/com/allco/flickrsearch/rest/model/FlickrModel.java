@@ -9,29 +9,7 @@ import java.util.List;
 
 public class FlickrModel {
 
-/*
-	"photos": {
-		"page": 1,
-				"pages": 4163,
-				"perpage": 100,
-				"total": "416264",
-				"photo": [
-		{
-			"id": "22767489222",
-				"owner": "50764246@N06",
-				"secret": "8783a3bfb7",
-				"server": "5719",
-				"farm": 6,
-				"title": "2015-11-2 IDWF President Myrtle Witbooi earns Global Fairness Award",
-				"ispublic": 1,
-				"isfriend": 0,
-				"isfamily": 0
-		},
-		*/
-
 	static class PhotosContainer {
-		int page;
-		int pages;
 		int total;
 		List<Entry> photo;
 	}
