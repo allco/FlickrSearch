@@ -7,7 +7,7 @@ import java.util.List;
  * Example of JSON can be found here: https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=588459f7180bc9126823d9a2e6ba6637&text=android&format=json&nojsoncallback=1
  */
 
-public class FlickrSearchResultModel {
+public class FlickrModel {
 
 /*
 	"photos": {
@@ -33,10 +33,10 @@ public class FlickrSearchResultModel {
 		int page;
 		int pages;
 		int total;
-		List<Photo> photo;
+		List<Entry> photo;
 	}
 
-	public static class Photo {
+	public static class Entry {
 		String id;
 		String secret;
 		String server;
@@ -57,7 +57,7 @@ public class FlickrSearchResultModel {
 
 	PhotosContainer photos;
 
-	public List<Photo> getEntries() {
+	public List<Entry> getEntries() {
 
 		return photos == null ? null : photos.photo;
 	}

@@ -3,18 +3,13 @@ package com.allco.flickrsearch.rest;
 import android.content.Context;
 import android.util.Log;
 
-import com.allco.flickrsearch.BuildConfig;
-import com.allco.flickrsearch.rest.model.FlickrSearchResultModel;
+import com.allco.flickrsearch.rest.model.FlickrModel;
 import com.allco.flickrsearch.rest.service.FlickerSearchService;
 import com.allco.flickrsearch.utils.Tools;
 import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import retrofit.Call;
@@ -90,10 +85,6 @@ public class RestClient {
 		okHttpClient.setReadTimeout(30, TimeUnit.SECONDS);
 		okHttpClient.setConnectTimeout(30, TimeUnit.SECONDS);
 
-		if (BuildConfig.DEBUG) {
-			addLogger(okHttpClient);
-		}
-
 		addCache(okHttpClient);
 
 		Retrofit retrofit = new Retrofit.Builder()
@@ -128,39 +119,16 @@ public class RestClient {
 		}
 	}
 
-	private static void addLogger(OkHttpClient okHttpClient) {
 
-		Interceptor logger = new Interceptor() {
-			@Override
-			public Response intercept(Chain chain) throws IOException {
 
-				Request request = chain.request();
-
-				long t1 = System.nanoTime();
-				Log.d("OkHttp", String.format("Sending request %s on %s%n%s",
-						request.url(), chain.connection(), request.headers()));
-
-				Response response = chain.proceed(request);
-
-				long t2 = System.nanoTime();
-				Log.d("OkHttp", String.format("Received response for %s in %.1fms%n%s",
-						response.request().url(), (t2 - t1) / 1e6d, response.headers()));
-
-				return response;
-			}
-		};
-
-		okHttpClient.interceptors().add(logger);
-	}
-
-	public Call<FlickrSearchResultModel> createCallFlickrSearch(String request, int pageNumber, int perPageCount, boolean allowCache) {
+	public Call<FlickrModel> createCallFlickrSearch(String request, int pageNumber, int perPageCount, boolean allowCache) {
 
 		String cacheControl = "";
-		if (ctx != null) {
+		if (ctx != null ) {
 			if (Tools.isNetworkAvailable(ctx)) {
 				cacheControl = "private, max-stale=" + (allowCache ? CACHE_EXPIRATION_TIME : 0);
 			} else {
-				int maxStale = CACHE_STALE_TOLERANCE; // tolerate 4-weeks stale
+				int maxStale = (allowCache ? CACHE_STALE_TOLERANCE : 0); // tolerate 4-weeks stale
 				cacheControl = "private, only-if-cached, max-stale=" + maxStale;
 			}
 		}

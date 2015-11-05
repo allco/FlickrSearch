@@ -59,15 +59,10 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 		// reset searchRequest at MainActivity
 		tryResetMainActivity();
 
-		// if network is unavailable
-	/*	if (!Tools.isNetworkAvailable(activity)) {
-			showMessage(R.string.network_unavailable);
-			return;
-		}*/
 
 		// if empty searchRequest
 		if (TextUtils.isEmpty(searchRequest)) {
-			showMessage(R.string.please_enter_text_search);
+			showMessage(R.string.please_enter_text_search, false);
 			return;
 		}
 
@@ -148,7 +143,7 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 
 		if (isFragmentDestroyed()) return; // if fragment is destroyed
 		if (adapter.isFinished() && adapter.getCount() < 1) {
-			showMessage(R.string.nothing_found_try_other_request);
+			showMessage(R.string.nothing_found_try_other_request, false);
 		}
 		else {
 			if (menuItemRefresh != null) menuItemRefresh.setVisible(true);
@@ -166,7 +161,9 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	public void onError(PhotoListAdapter adapter) {
 
 		if (isFragmentDestroyed()) return;
-		showMessage(R.string.error_occurred);
+		if (adapter.getCount() <= 0) {
+			showMessage(R.string.error_occurred, true);
+		}
 	}
 
 	/**
@@ -203,11 +200,15 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	/**
 	 * Shows text banner and hide ListView
 	 *
+	 *
 	 * @param resId message resource Id for banner
 	 */
-	private void showMessage(int resId) {
+	private void showMessage(int resId, boolean showRefresh) {
 
-		if (menuItemRefresh != null) menuItemRefresh.setVisible(false);
+		if (menuItemRefresh != null && menuItemRefresh.isVisible() != showRefresh) {
+			menuItemRefresh.setVisible(showRefresh);
+		}
+
 		setListAdapter(null);
 		setEmptyText(getString(resId));
 		setListShownNoAnimation(true);

@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.allco.flickrsearch.rest.RestClient;
-import com.allco.flickrsearch.rest.model.FlickrSearchResultModel;
+import com.allco.flickrsearch.rest.model.FlickrModel;
 import com.allco.flickrsearch.utils.BitmapBorderTransformer;
 import com.allco.flickrsearch.utils.Tools;
 import com.squareup.picasso.Picasso;
@@ -30,7 +30,7 @@ import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
 import static com.allco.flickrsearch.utils.Preconditions.checkState;
 
 /**
- * Adapter for store and handling data received from Google.
+ * Adapter for store and handling data received from Flickr.
  * The first network request will be launched when {@link #reset(String,boolean)} will be called.
  * To load additional data the next network request will be instantiated when list item of type
  * ITEM_TYPE.PROGRESS will be created, and so on.
@@ -43,7 +43,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	private final String TAG = this.getClass().getSimpleName();
 	// Represent current request to Google.
 	// null when there is no active request at this moment.
-	private Call<FlickrSearchResultModel> currentCall;
+	private Call<FlickrModel> currentCall;
 	// The source of new currentCall.
 	private final RestClient restClient;
 	// size of Thumbs in pixels used for optimize Picasso loadings
@@ -52,7 +52,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	private final Context ctx;
 	private final Listener listener;
 	private final BitmapBorderTransformer sBitmapTransformer; // transformer for Picasso
-	private ArrayList<FlickrSearchResultModel.Photo> listEntries; // holder for news-items
+	private ArrayList<FlickrModel.Entry> listEntries; // holder for news-items
 	private boolean isFinished = false; // true when all data pages is loaded or error occurred
 	private String request; // The search request.
 	private boolean allowCachedContent = true;
@@ -159,8 +159,8 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 		currentCall = restClient.createCallFlickrSearch(request, lastLoadedPageNumber, PER_PAGE_COUNT, allowCachedContent);
 		// start request
 		currentCall.enqueue
-				(new Callback<FlickrSearchResultModel>() {
-					final Call<FlickrSearchResultModel> call = currentCall;
+				(new Callback<FlickrModel>() {
+					final Call<FlickrModel> call = currentCall;
 
 					/**
 					 * Called when request is successfully finished.
@@ -168,14 +168,14 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 					 * @param retrofit instance of Retrofit which was used to done this request
 					 */
 					@Override
-					public void onResponse(Response<FlickrSearchResultModel> response, Retrofit retrofit) {
+					public void onResponse(Response<FlickrModel> response, Retrofit retrofit) {
 
 						if (call != currentCall) return;
 						// if we got not HTTP_OK then report of error and exit
 						if (response.code() != 200) onFailure(null);
 						else {
 							// get data
-							FlickrSearchResultModel body = response.body();
+							FlickrModel body = response.body();
 							// deliver data to further handling
 							onEntriesReceived(body);
 						}
@@ -214,9 +214,9 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	 *
 	 * @param body piece of data
 	 */
-	private void onEntriesReceived(FlickrSearchResultModel body) {
+	private void onEntriesReceived(FlickrModel body) {
 
-		List<FlickrSearchResultModel.Photo> entries = body == null ? null : body.getEntries();
+		List<FlickrModel.Entry> entries = body == null ? null : body.getEntries();
 
 		currentCall = null;
 		// if no data, complete loading
@@ -249,14 +249,14 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
 	public String getItemPhotoUrl(int position) {
 		Object item = getItem(position);
-		if (!(item instanceof FlickrSearchResultModel.Photo)) return null;
-		return ((FlickrSearchResultModel.Photo) item).getImageUrl();
+		if (!(item instanceof FlickrModel.Entry)) return null;
+		return ((FlickrModel.Entry) item).getImageUrl();
 	}
 
 	public String getItemTitle(int position) {
 		Object item = getItem(position);
-		if (!(item instanceof FlickrSearchResultModel.Photo)) return null;
-		return ((FlickrSearchResultModel.Photo) item).getTitle();
+		if (!(item instanceof FlickrModel.Entry)) return null;
+		return ((FlickrModel.Entry) item).getTitle();
 	}
 
 
@@ -297,7 +297,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 			h = new Holder(convertView);
 		} else h = Holder.getHolder(convertView);
 
-		FlickrSearchResultModel.Photo entry = listEntries.get(position);
+		FlickrModel.Entry entry = listEntries.get(position);
 		String imageUrl = entry.getImageUrl();
 
 		if (!TextUtils.isEmpty(imageUrl)) {
