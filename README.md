@@ -6,11 +6,11 @@ FlickrSearch takes your search request and asks Flickr for public photos relevan
 
 To install application on device run command (do not forget setup ANDROID_HOME environment variable):
 * for Purple flavor:
-    ** `./gradlew installPurpleColoredRelease` # on Linux, MacOS
-    ** `./gradlew.bat installPurpleColoredRelease` # on Windows
+    * `./gradlew installPurpleColoredRelease` # on Linux, MacOS
+    * `./gradlew.bat installPurpleColoredRelease` # on Windows
 * or for Green flavor:   
-    ** `./gradlew installGreenColoredRelease` # on Linux, MacOS
-    ** `./gradlew.bat installGreenColoredRelease` # on Windows
+    * `./gradlew installGreenColoredRelease` # on Linux, MacOS
+    * `./gradlew.bat installGreenColoredRelease` # on Windows
 
 To run Android Instrumentation Tests run:
 * `./gradlew cAT` # on Linux, MacOS
