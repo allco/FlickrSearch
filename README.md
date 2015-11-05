@@ -10,6 +10,7 @@ FlickrSearch takes your search request and asks Flickr for public photos relevan
 Disk cache for network responses is used in this application. 
 Every time when a search request is given, the Cache is checked for stored responses with URL as a key. 
 If stored response exists then it will be used and no network transmission happened.  
+
 If "Refresh" button is pressed then the Cache won't be used.
 The expiration time for responses in the Cache for online mode is stored at RestClient.CACHE_EXPIRATION_TIME (1 hour by default).
 
@@ -19,7 +20,9 @@ The expiration time for offline mode is stored at RestClient.CACHE_STALE_TOLERAN
 
 -----
 
+
 **To install application on device:**
+
 Run command (do not forget setup ANDROID_HOME environment variable):
 * for Purple flavor:
     * `./gradlew installPurpleColoredRelease` # on Linux, MacOS
@@ -28,7 +31,11 @@ Run command (do not forget setup ANDROID_HOME environment variable):
     * `./gradlew installGreenColoredRelease` # on Linux, MacOS
     * `./gradlew.bat installGreenColoredRelease` # on Windows
 
+------
+
 **To run Android Instrumentation Tests run:**
+
+(device should be attached and unlocked)
 * `./gradlew cAT` # on Linux, MacOS
 * `./gradlew.bat cAT` # on Windows
 
@@ -36,6 +43,7 @@ Run command (do not forget setup ANDROID_HOME environment variable):
 * `./gradlew test` # on Linux, MacOS
 * `./gradlew.bat test` # on Windows
 
+------
 
 **Used 3d party Libraries:**
 * Retrofit (OkHttp, Gson) http://square.github.io/retrofit/
