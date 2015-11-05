@@ -4,9 +4,9 @@ This is an example of Android application and example os some techniques for aut
 
 FlickrSearch takes your search request and asks Flickr for public photos relevant to that request and shows the result in ListView. Each ListView's item can be clicked to open in dedicated Activity for comfortable watching.
 
------
 
-**Cache**
+Cache
+-----
 Disk cache for network responses is used in this application. 
 Every time when a search request is given, the Cache is checked for stored responses with URL as a key. 
 If stored response exists then it will be used and no network transmission happened.  
