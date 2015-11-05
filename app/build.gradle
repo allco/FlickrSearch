@@ -4,19 +4,110 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
+    def APP_ID_PREFIX = "com.allco.flickrsearch"
+
     defaultConfig {
-        applicationId "com.allco.flickrsearch"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
+
+
+    signingConfigs {
+        release {
+            storeFile file('src/main/app_release.keystore')
+            storePassword '123qwe123'
+            keyAlias 'app_release'
+            keyPassword '123qwe123'
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
+
+    flavorDimensions 'color'
+
+    productFlavors
+            {
+                GreenColored
+                        {
+                            flavorDimension 'color'
+                            applicationId APP_ID_PREFIX + ".green"
+                        }
+
+                PurpleColored
+                        {
+                            flavorDimension 'color'
+                            applicationId APP_ID_PREFIX + ".purple"
+                        }
+            }
+
+
+    sourceSets
+            {
+
+
+                def PATH_FLAVORS = 'src/'
+                def path = PATH_FLAVORS + 'Green/';
+                GreenColored
+                        {
+                            res.srcDirs = [path + 'res']
+                            java.srcDirs = [path + 'java']
+                            assets.srcDirs = [path + 'assets']
+                        }
+
+                path = PATH_FLAVORS + 'Purple/';
+                PurpleColored
+                        {
+                            res.srcDirs = [path + 'res']
+                            java.srcDirs = [path + 'java']
+                            assets.srcDirs = [path + 'assets']
+                        }
+
+            }
+
+    applicationVariants.all { variant ->
+        boolean isRelease = variant.buildType.name.contains('release')
+        String filename = ''
+
+        for (def flavor : variant.productFlavors) {
+            def name = flavor.name + '-'
+            filename += name
+        }
+
+        filename += (isRelease ? 'release' : 'debug')
+
+        variant.outputs.each { output ->
+            changeOutputFilename(output, filename, variant.versionName)
+
+            if (output.zipAlign) {
+                changeOutputFilename(output, filename, variant.versionName)
+            }
+        }
+    }
+}
+
+def changeOutputFilename(outputTask, newNamePrefix, version) {
+    def file = outputTask.outputFile
+
+    def suffix = '-v' + version + '.apk'
+
+    def newName = (file.name =~ /\.apk$/).replaceAll('').split('-').drop(4).join('-')
+    if (newName.length() > 0) {
+        newName = '-' + newName
+    }
+
+    newName = newNamePrefix + newName + suffix
+
+    outputTask.outputFile = new File(file.parentFile, newName)
 }
 
 dependencies {

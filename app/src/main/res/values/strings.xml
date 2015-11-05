@@ -8,7 +8,10 @@
 	<string name="network_unavailable">Please check your Internet connection.</string>
 	<string name="progress_loading">loading…</string>
 	<string name="nothing_found_try_other_request">Nothing found.\nTry another request.</string>
-	<string name="cd_result_item_photo">result photo</string>
 	<string name="action_send">Send request</string>
+
+    <string name="cd_result_item_photo">result photo</string>
+    <string name="header_title">Title:</string>
+    <string name="header_photo">Photo:</string>
 
 </resources>

@@ -20,7 +20,7 @@ import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
 /**
  * Shows the result of search at Flickr with given request string.
  */
-public class PhotoListFragment extends ListFragment implements PhotoListAdapter.Listener, IdlingProvider {
+public class PhotoListFragment extends ListFragment implements PhotoListAdapter.Listener {
 
 	private final static String ARG_SEARCH_REQ = "ARG_SEARCH_REQ";
 	private String searchRequest;
@@ -149,7 +149,8 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 		if (isFragmentDestroyed()) return; // if fragment is destroyed
 		if (adapter.isFinished() && adapter.getCount() < 1) {
 			showMessage(R.string.nothing_found_try_other_request);
-		} else {
+		}
+		else {
 			if (menuItemRefresh != null) menuItemRefresh.setVisible(true);
 			setListShown(true);
 		}
@@ -193,20 +194,10 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 
 		if (isFragmentDestroyed()) return;
 
-		/*String url = listAdapter.getItemUrl(position);
-		// is item has no url, then toast and exit
-		if (TextUtils.isEmpty(url)) {
-			Toast.makeText(getContext(), "Url is empty", Toast.LENGTH_SHORT).show();
-			return;
-		}
-
-		/* // Launch OS built-in browser.
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-		String title = getResources().getString(R.string.chooser_title);
-		Intent chooser = Intent.createChooser(intent, title);
-		if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-			startActivity(chooser);
-		}*/
+		PhotoViewerActivity.start(getActivity(),
+								  listAdapter.getItemTitle(position),
+								  listAdapter.getItemPhotoUrl(position)
+								 );
 	}
 
 	/**
@@ -227,16 +218,6 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 		return searchRequest;
 	}
 
-	/**
-	 * Implementation of IdlingProvider's method.
-	 *
-	 * @return true if some async processes in progress at this moment
-	 */
-	@Override
-	public boolean isIdleNow() {
-
-		return listAdapter == null || listAdapter.isIdleNow();
-	}
 
 	public void refresh() {
 

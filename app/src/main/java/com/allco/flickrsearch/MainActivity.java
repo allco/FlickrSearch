@@ -13,7 +13,8 @@ import android.text.TextUtils;
  * Main activity.
  * Handles all fragments and views.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+
 	private SearchView searchView;
 
 	@Override
@@ -22,64 +23,65 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		/*if (BuildConfig.DEBUG) {
-			Picasso.with(this).setIndicatorsEnabled(true);
-		}*/
-
 		// set up toolbar
 		final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		if (toolbar != null) setSupportActionBar(toolbar);
 
 		// tune searchView
 		searchView = (SearchView) findViewById(R.id.searchView);
-		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-			boolean isSubmitVisible = false; // <code>true</code> if submitButton is visible
-
-			@Override
-			public boolean onQueryTextSubmit(String query) {
-
-				if (!isSearchRequestApplicable(query)) return true;
-				showSubmitButton(false);
-				searchView.clearFocus();
-				// create new fragment and add it to this Activity
-				replaceFragment(PhotoListFragment.newInstance(query), true);
-				return true;
-			}
-
-			@Override
-			public boolean onQueryTextChange(String newText) {
-				// search query is applicable than submit button will appear
-				showSubmitButton(isSearchRequestApplicable(newText));
-				return false;
-			}
-
-			/**
-			 * Show submit button
-			 * @param show - true if show
-			 */
-			private void showSubmitButton(boolean show) {
-
-				if (show == isSubmitVisible) return;
-				isSubmitVisible = show;
-				searchView.setSubmitButtonEnabled(isSubmitVisible);
-			}
-		});
-
-		// clear initial focus on searchView
-		searchView.post(new Runnable() {
-			@Override
-			public void run() {
-
-				searchView.clearFocus();
-			}
-		});
+		searchView.setOnQueryTextListener(this);
 
 		// create initial instance of NewsFragment
 		PhotoListFragment photoListFragment = getCurrentPhotosFragment();
 		if (photoListFragment == null) {
 			replaceFragment(PhotoListFragment.newInstance(null), false);
 		}
+	}
+
+	@Override
+	protected void onResume() {
+
+		// clear initial focus on searchView
+
+		searchView.post(new Runnable() {
+			@Override
+			public void run() {
+
+				if (searchView != null) {
+					searchView.clearFocus();
+				}
+			}
+		});
+		super.onResume();
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+
+		if (!isSearchRequestApplicable(query)) return true;
+		showSubmitButton(false);
+		searchView.clearFocus();
+		// create new fragment and add it to this Activity
+		replaceFragment(PhotoListFragment.newInstance(query), true);
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		// search query is applicable than submit button will appear
+		showSubmitButton(isSearchRequestApplicable(newText));
+		return false;
+	}
+
+	/**
+	 * Show submit button
+	 *
+	 * @param show - true if show
+	 */
+	private void showSubmitButton(boolean show) {
+
+		if (show == searchView.isSubmitButtonEnabled()) return;
+		searchView.setSubmitButtonEnabled(show);
 	}
 
 	/**
@@ -139,6 +141,5 @@ public class MainActivity extends AppCompatActivity {
 
 		fragmentTransaction.commit();
 	}
-
 
 }

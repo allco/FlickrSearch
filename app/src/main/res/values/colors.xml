@@ -9,7 +9,10 @@
     <color name="primary_dark">#388E3C</color>
     <color name="primary_light" tools:ignore="UnusedResources">#C8E6C9</color>
     <color name="accent">#FF4081</color>
-    <color name="primary_text">#212121</color>
+    <!--<color name="primary_text">#212121</color>-->
+    <!--<color name="secondary_text">#727272</color>-->
+
+    <color name="primary_text">#fff</color>
     <color name="secondary_text">#727272</color>
 
     <color name="gray_light">#AABBBBBB</color>

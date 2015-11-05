@@ -36,7 +36,7 @@ import static com.allco.flickrsearch.utils.Preconditions.checkState;
  * ITEM_TYPE.PROGRESS will be created, and so on.
  * ITEM_TYPE.PROGRESS is won't be created when all data will be loaded or error occurs.
  */
-public class PhotoListAdapter extends BaseAdapter implements IdlingProvider, AbsListView.OnScrollListener {
+public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener {
 
 	public static final int PER_PAGE_COUNT = 10;
 	private static final int ITEMS_COUNT_LIMIT = 10000;
@@ -247,6 +247,19 @@ public class PhotoListAdapter extends BaseAdapter implements IdlingProvider, Abs
 		return ((FlickrSearchResultModel.Photo) item).;
 	}*/
 
+	public String getItemPhotoUrl(int position) {
+		Object item = getItem(position);
+		if (!(item instanceof FlickrSearchResultModel.Photo)) return null;
+		return ((FlickrSearchResultModel.Photo) item).getImageUrl();
+	}
+
+	public String getItemTitle(int position) {
+		Object item = getItem(position);
+		if (!(item instanceof FlickrSearchResultModel.Photo)) return null;
+		return ((FlickrSearchResultModel.Photo) item).getTitle();
+	}
+
+
 
 	/**
 	 * the View holder pattern implementation
@@ -333,16 +346,6 @@ public class PhotoListAdapter extends BaseAdapter implements IdlingProvider, Abs
 		return getRegularItemView(position, convertView);
 	}
 
-
-
-	/**
-	 * @return true if there is no async task in progress at this moment
-	 */
-	@Override
-	public boolean isIdleNow() {
-
-		return currentCall == null || isFinished();
-	}
 
 	/**
 	 * @return true if all async tasks is completed and won't be launched until {@link #reset(String,boolean)} will be called

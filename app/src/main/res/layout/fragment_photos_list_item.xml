@@ -9,8 +9,8 @@
 
 	<ImageView
 		android:id="@+id/iv_icon"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="@dimen/thumb_size"
+		android:layout_height="@dimen/thumb_size"
 		android:layout_marginEnd="@dimen/padding_normal"
 		android:layout_marginRight="@dimen/padding_normal"
 		android:contentDescription="@string/cd_result_item_photo"
@@ -20,12 +20,9 @@
 
 	<TextView
 		android:id="@+id/tv_title"
-		style="@style/TextTitle"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:ellipsize="end"
-		android:maxLines="4"
-		android:singleLine="false"
-		/>
+        android:layout_height="wrap_content"
+        style="@style/ListItem_TextTitle"
+        />
 
 </LinearLayout>
