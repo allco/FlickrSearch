@@ -39,7 +39,7 @@ import static com.allco.flickrsearch.utils.Preconditions.checkState;
 public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener, IdlingProvider {
 
 	// per page items count
-	public static final int PER_PAGE_COUNT = 10;
+	private static final int PER_PAGE_COUNT = 10;
 	// limit fot total count of items
 	private static final int ITEMS_COUNT_LIMIT = 10000;
 	private final String TAG = this.getClass().getSimpleName();

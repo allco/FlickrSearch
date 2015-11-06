@@ -23,11 +23,11 @@ public class RestClient {
 	static private final String BASE_URL_FLICKR = "https://api.flickr.com";
 
 	// size of disk cache for HTTP responses
-	public static final int CACHE_MAX_SIZE = 10 * 1024 * 1024; // 10 Mb
+	private static final int CACHE_MAX_SIZE = 10 * 1024 * 1024; // 10 Mb
 	// cache expiration time for online mode, in seconds
-	public static final int CACHE_EXPIRATION_TIME = 60 * 60; // 1 hour
+	private static final int CACHE_EXPIRATION_TIME = 60 * 60; // 1 hour
 	// cache expiration time for offline mode, in seconds
-	public static final int CACHE_STALE_TOLERANCE = 60 * 60 * 24; // 1 day
+	private static final int CACHE_STALE_TOLERANCE = 60 * 60 * 24; // 1 day
 
 	private FlickerSearchService flickrSearchService;
 	private Context ctx;

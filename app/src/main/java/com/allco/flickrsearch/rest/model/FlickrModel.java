@@ -33,7 +33,7 @@ public class FlickrModel {
 
 	}
 
-	PhotosContainer photos;
+	private PhotosContainer photos;
 
 	public List<Entry> getEntries() {
 

@@ -230,7 +230,7 @@ public class PhotoListFragment extends ListFragment implements PhotoListAdapter.
 	 * Refresh content.
 	 * Cache using will be forbidden
 	 */
-	public void refresh() {
+	private void refresh() {
 
 		if (listAdapter != null) {
 			setListShown(false);

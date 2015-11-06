@@ -82,7 +82,7 @@ public final class Preconditions {
 		}
 	}
 
-	static String format(String template, @Nullable Object... args) {
+	private static String format(String template, @Nullable Object... args) {
 
 		template = String.valueOf(template);
 		int args_length = args == null ? 0 : args.length;
