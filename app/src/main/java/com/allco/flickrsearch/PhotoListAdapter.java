@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.allco.flickrsearch.ioc.IoC;
 import com.allco.flickrsearch.rest.RestClient;
 import com.allco.flickrsearch.rest.model.FlickrModel;
 import com.allco.flickrsearch.utils.BitmapBorderTransformer;
@@ -19,6 +20,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -38,6 +41,9 @@ import static com.allco.flickrsearch.utils.Preconditions.checkState;
  */
 public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener, IdlingProvider {
 
+    @Inject
+    RestClient restClient;
+
 	// per page items count
 	private static final int PER_PAGE_COUNT = 10;
 	// limit fot total count of items
@@ -46,8 +52,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	// Represent current request to Flickr.
 	// null when there is no active request at this moment.
 	private Call<FlickrModel> currentCall;
-	// The source of new currentCall.
-	private final RestClient restClient;
+
 	// size of Thumbs in pixels used for optimize Picasso loadings
 	private final int sizeThumbPixels;
 
@@ -93,24 +98,22 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 	 */
 	public static PhotoListAdapter newInstance(Context ctx, Listener listener) {
 
-		// access restClient singleton - the network request handler
-		RestClient restClient = RestClient.Factory.getRestClient(ctx);
-
 		Resources res = ctx.getResources();
 		int sizeThumbPixels = res.getDimensionPixelSize(R.dimen.thumb_size);
 		int sizeThumbRoundPixels = res.getDimensionPixelSize(R.dimen.thumb_round_corner_size);
 
 		@SuppressWarnings("deprecation")
 		BitmapBorderTransformer bitmapTransformer = new BitmapBorderTransformer(1 /*border size*/, sizeThumbRoundPixels, res.getColor(R.color.gray_light));
-		return new PhotoListAdapter(ctx, sizeThumbPixels, bitmapTransformer, restClient, listener);
+		return new PhotoListAdapter(ctx, sizeThumbPixels, bitmapTransformer, listener);
 	}
 
 	// Constructor
-	private PhotoListAdapter(Context ctx, int sizeThumbPixels, BitmapBorderTransformer bitmapTransformer, RestClient restClient, Listener listener) {
+	private PhotoListAdapter(Context ctx, int sizeThumbPixels, BitmapBorderTransformer bitmapTransformer, Listener listener) {
+
+        IoC.getInstance().getApplicationComponent().inject(this);
 
 		checkArgument(sizeThumbPixels > 0);
 		this.ctx = checkNotNull(ctx);
-		this.restClient = checkNotNull(restClient);
 		this.sBitmapTransformer = bitmapTransformer;
 		this.sizeThumbPixels = sizeThumbPixels;
 		this.listener = listener;
