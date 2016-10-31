@@ -1,4 +1,4 @@
-package com.allco.flickrsearch;
+package com.allco.flickrsearch.photolist;
 
 /**
  * Used by tests to handle async operation

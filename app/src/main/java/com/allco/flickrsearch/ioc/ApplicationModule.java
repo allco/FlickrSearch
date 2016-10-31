@@ -15,6 +15,7 @@ import dagger.Provides;
 
 import static com.allco.flickrsearch.rest.RestClient.END_POINT;
 
+@SuppressWarnings("WeakerAccess")
 @Module
 public class ApplicationModule {
 

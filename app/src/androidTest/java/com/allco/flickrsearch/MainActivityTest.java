@@ -6,6 +6,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.allco.flickrsearch.photolist.PhotoListFragment;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

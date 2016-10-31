@@ -9,11 +9,14 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 
+import com.allco.flickrsearch.photolist.PhotoListFragment;
+import com.allco.flickrsearch.photolist.PhotoListPresenter;
+
 /**
  * Main activity.
  * Handles all fragments with search results.
  */
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PhotoListPresenter.Listener {
 
 	private SearchView searchView;
 
@@ -147,4 +150,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 		fragmentTransaction.commit();
 	}
 
+    @Override
+    public void onRequestChanged(String request) {
+        setSearchRequest(request);
+    }
 }

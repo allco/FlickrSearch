@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.allco.flickrsearch.rest.RestClientImpl;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 
@@ -105,7 +104,7 @@ public class PhotoListFragmentTest {
 		server = new MockWebServer();
 		server.start();
 		// Enable test case mode. Ever
-		RestClientImpl.Factory.enableTestCase(server.url("/").toString());
+		//RestClientImpl.Factory.enableTestCase(server.url("/").toString());
 	}
 
 	/**

@@ -2,9 +2,8 @@ package com.allco.flickrsearch.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.support.annotation.NonNull;
 import android.text.Html;
-
-import static com.allco.flickrsearch.utils.Preconditions.checkNotNull;
 
 /**
  * Container for utils
@@ -24,8 +23,7 @@ public class Tools {
 	 * @param ctx - the Context imnstance
 	 * @return <code>true</code> if WiFi enabled and connected or Cellular data available
 	 */
-	public static boolean isNetworkAvailable(Context ctx) {
-		ctx = checkNotNull(ctx);
+	public static boolean isNetworkAvailable(@NonNull Context ctx) {
 		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return cm != null && cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
 	}

@@ -2,6 +2,8 @@ package com.allco.flickrsearch;
 
 import android.support.test.espresso.IdlingResource;
 
+import com.allco.flickrsearch.photolist.IdlingProvider;
+
 import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
 
 /**
