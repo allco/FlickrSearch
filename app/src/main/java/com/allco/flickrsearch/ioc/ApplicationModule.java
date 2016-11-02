@@ -2,10 +2,10 @@ package com.allco.flickrsearch.ioc;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import com.allco.flickrsearch.rest.RestClient;
-import com.allco.flickrsearch.rest.RestClientImpl;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -13,12 +13,12 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-import static com.allco.flickrsearch.rest.RestClient.END_POINT;
 
 @SuppressWarnings("WeakerAccess")
 @Module
 public class ApplicationModule {
 
+    public static final String END_POINT = "END_POINT";
     @NonNull
     private final Context appContext;
 
@@ -30,10 +30,10 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    @Named(END_POINT)
-    public String provideFlickrSearchEndPoint() {return "https://api.flickr.com";}
+    public Resources provideResources(Context context) {return context.getResources();}
 
     @Provides
     @Singleton
-    public RestClient provideRestClient(Context ctx, @Named(END_POINT) String endPoint) {return  new RestClientImpl(ctx, endPoint);}
+    @Named(END_POINT)
+    public String provideFlickrSearchEndPoint() {return "https://api.flickr.com";}
 }

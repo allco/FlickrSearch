@@ -104,7 +104,7 @@ public class PhotoListFragmentTest {
 		server = new MockWebServer();
 		server.start();
 		// Enable test case mode. Ever
-		//RestClientImpl.Factory.enableTestCase(server.url("/").toString());
+		//RestClient.Factory.enableTestCase(server.url("/").toString());
 	}
 
 	/**

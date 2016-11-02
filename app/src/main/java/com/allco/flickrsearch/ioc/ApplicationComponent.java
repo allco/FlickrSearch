@@ -13,6 +13,6 @@ import dagger.Component;
 public interface ApplicationComponent {
 
     void inject(PhotoListAdapter photoListAdapter);
-    RestClient restClient();
     PhotoListComponent photoListComponent();
+    RestClient restClient();
 }

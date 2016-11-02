@@ -1,7 +1,9 @@
 package com.allco.flickrsearch.photolist;
 
 import android.content.Context;
-import android.content.res.Resources;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -12,7 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.allco.flickrsearch.R;
-import com.allco.flickrsearch.ioc.IoC;
+import com.allco.flickrsearch.photolist.ioc.PhotoListModule;
+import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
 import com.allco.flickrsearch.rest.RestClient;
 import com.allco.flickrsearch.rest.model.FlickrModel;
 import com.allco.flickrsearch.utils.BitmapBorderTransformer;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -36,10 +40,8 @@ import retrofit.Retrofit;
  * ITEM_TYPE.PROGRESS is about to going to visible, and so on.
  * ITEM_TYPE.PROGRESS is won't be created when all data will be loaded or error occurs.
  */
+@PhotoListScope
 public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener, IdlingProvider {
-
-    @Inject
-    RestClient restClient;
 
     // per page items count
     private static final int PER_PAGE_COUNT = 10;
@@ -53,14 +55,20 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
     // size of Thumbs in pixels used for optimize Picasso loadings
     private final int sizeThumbPixels;
 
+    @Nullable
+    private Listener listener;
+    @NonNull
     private final Context ctx;
-    private final Listener listener;
+    @NonNull
     private final BitmapBorderTransformer sBitmapTransformer; // transformer for Picasso
+    @NonNull
+    private final RestClient restClient;
+
     private ArrayList<FlickrModel.Entry> listEntries; // holder for news-items
-    private boolean isFinished = false; // true when all data pages is loaded or error occurred
-    private String request; // The search request.
     private boolean allowCachedContent = true; // if false the no cache will be used
     private int lastLoadedPageNumber = 0; // page number generator for requests
+    private boolean isFinished = false; // true when all data pages is loaded or error occurred
+    private String request; // The search request.
 
     // type of view item
     private enum ITEM_TYPE {
@@ -71,7 +79,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
      * Should be implemented by clients.
      * Deliver data loading events.
      */
-    public interface Listener {
+    interface Listener {
 
         /**
          * Called when next data page is received
@@ -87,42 +95,22 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         void onError(PhotoListAdapter adapter);
     }
 
-    /**
-     * Factory method for NewsAdapter
-     *
-     * @param ctx      Context instance
-     * @param listener Implemented by Client instance of {@link Listener}
-     * @return created instance of NewsAdapter
-     */
-    public static PhotoListAdapter newInstance(Context ctx, Listener listener) {
-
-        Resources res = ctx.getResources();
-        int sizeThumbPixels = res.getDimensionPixelSize(R.dimen.thumb_size);
-        int sizeThumbRoundPixels = res.getDimensionPixelSize(R.dimen.thumb_round_corner_size);
-
-        @SuppressWarnings("deprecation")
-        BitmapBorderTransformer bitmapTransformer = new BitmapBorderTransformer(1 /*border size*/, sizeThumbRoundPixels, res.getColor(R.color.gray_light));
-        return new PhotoListAdapter(ctx, sizeThumbPixels, bitmapTransformer, listener);
-    }
-
-    // Constructor
-    private PhotoListAdapter(Context ctx, int sizeThumbPixels, BitmapBorderTransformer bitmapTransformer, Listener listener) {
-
-        IoC.getInstance().getApplicationComponent().inject(this);
-
+    @Inject
+    public PhotoListAdapter(@NonNull Context ctx,
+                            @NonNull RestClient restClient,
+                            @NonNull BitmapBorderTransformer bitmapTransformer,
+                            @Named(PhotoListModule.THUMB_SIZE) @IntRange(from = 1) int sizeThumbPixels) {
         this.ctx = ctx;
+        this.restClient = restClient;
         this.sBitmapTransformer = bitmapTransformer;
         this.sizeThumbPixels = sizeThumbPixels;
+    }
+
+    void setListener(@Nullable Listener listener) {
         this.listener = listener;
     }
 
-    /**
-     * Erase previous state and initialize new data loading.
-     *
-     * @param request search request
-     * @return "this" pointer
-     */
-    public PhotoListAdapter reset(String request, boolean allowCachedContent) {
+    PhotoListAdapter reset(String request, boolean allowCachedContent) {
 
         boolean notifyRequired = listEntries != null;
 
@@ -269,7 +257,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
      * @param position interested items position
      * @return The item's photo URL if it exist at given position
      */
-    public String getItemPhotoUrl(int position) {
+    String getItemPhotoUrl(int position) {
         Object item = getItem(position);
         if (!(item instanceof FlickrModel.Entry)) {
             return null;
@@ -281,7 +269,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
      * @param position interested items position
      * @return The item's Title if it exist at given position
      */
-    public String getItemTitle(int position) {
+    String getItemTitle(int position) {
         Object item = getItem(position);
         if (!(item instanceof FlickrModel.Entry)) {
             return null;
@@ -297,14 +285,14 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         final ImageView icon;
         final TextView tvTitle;
 
-        public Holder(View view) {
+        Holder(View view) {
 
             icon = (ImageView) view.findViewById(R.id.iv_icon);
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
             view.setTag(this);
         }
 
-        public static Holder getHolder(View v) {
+        static Holder getHolder(View v) {
 
             return (Holder) v.getTag();
         }
@@ -386,7 +374,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
     /**
      * @return true if all async tasks is completed and won't be launched until {@link #reset(String, boolean)} will be called
      */
-    public boolean isFinished() {
+    boolean isFinished() {
 
         return isFinished;
     }

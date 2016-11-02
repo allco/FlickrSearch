@@ -82,7 +82,7 @@ public class RestClientTest {
 
     /**
      * The Test will be passed if:
-     * 1. {@link RestClientImpl} is created.
+     * 1. {@link RestClient} is created.
      * 2. Request executed
      * 3. Data received and successfully parsed
      *
