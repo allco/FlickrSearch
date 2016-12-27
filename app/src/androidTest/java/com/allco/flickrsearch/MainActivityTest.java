@@ -6,7 +6,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.allco.flickrsearch.photolist.PhotoListFragment;
+import com.allco.flickrsearch.photolist.view.PhotoListFragment;
 
 import org.junit.Rule;
 import org.junit.Test;

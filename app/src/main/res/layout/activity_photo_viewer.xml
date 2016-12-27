@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context="com.allco.flickrsearch.photolist.PhotoViewerActivity"
+    tools:context="com.allco.flickrsearch.photodetails.PhotoDetailsActivity"
     >
 
     <android.support.v7.widget.Toolbar

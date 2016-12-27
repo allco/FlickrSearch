@@ -1,11 +1,8 @@
 package com.allco.flickrsearch.ioc;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
-
-import com.allco.flickrsearch.rest.RestClient;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,7 +19,9 @@ public class ApplicationModule {
     @NonNull
     private final Context appContext;
 
-    public ApplicationModule(@NonNull Application appContext) {this.appContext = appContext;}
+    public ApplicationModule(@NonNull Context appContext) {
+        this.appContext = appContext;
+    }
 
     @Provides
     @Singleton

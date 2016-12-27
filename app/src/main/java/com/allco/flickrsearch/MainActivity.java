@@ -9,8 +9,8 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 
-import com.allco.flickrsearch.photolist.PhotoListFragment;
 import com.allco.flickrsearch.photolist.PhotoListPresenter;
+import com.allco.flickrsearch.photolist.view.PhotoListFragment;
 
 /**
  * Main activity.
@@ -45,13 +45,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 	protected void onResume() {
 
 		// clear initial focus on searchView
-		searchView.post(new Runnable() {
-			@Override
-			public void run() {
-
-				if (searchView != null) {
-					searchView.clearFocus();
-				}
+		searchView.post(() -> {
+			if (searchView != null) {
+				searchView.clearFocus();
 			}
 		});
 		super.onResume();

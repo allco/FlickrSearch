@@ -8,7 +8,7 @@ import android.text.Html;
 /**
  * Container for utils
  */
-public class Tools {
+public class Utils {
 
 	/**
 	 * Remove any html tags from <code>str</code>.

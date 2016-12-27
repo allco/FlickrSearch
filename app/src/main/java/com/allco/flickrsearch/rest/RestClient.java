@@ -5,9 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.allco.flickrsearch.rest.model.FlickrModel;
-import com.allco.flickrsearch.rest.service.FlickerSearchService;
-import com.allco.flickrsearch.utils.Tools;
+import com.allco.flickrsearch.utils.Utils;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -48,7 +46,7 @@ public class RestClient {
         this.endPoint = endPoint;
     }
 
-    public Call<FlickrModel> createCallFlickrSearch(String request, int pageNumber, int perPageCount, boolean allowCache) {
+    public Call<FlickrItemData> createCallFlickrSearch(String request, int pageNumber, int perPageCount, boolean allowCache) {
 
         tryInitialize();
 
@@ -61,7 +59,7 @@ public class RestClient {
         if (cacheEnabled) {
             // if Internet connection is available
             // use cache regards allowCache variable values
-            if (Tools.isNetworkAvailable(ctx)) {
+            if (Utils.isNetworkAvailable(ctx)) {
                 cacheControl = "private, max-stale=" + (allowCache ? CACHE_EXPIRATION_TIME : 0);
             } else {
                 int maxStale = (allowCache ? CACHE_STALE_TOLERANCE : 0); // tolerate 4-weeks stale

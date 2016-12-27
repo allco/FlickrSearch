@@ -1,4 +1,4 @@
-package com.allco.flickrsearch.rest;
+package com.allco.flickrsearch;
 
 import java.io.IOException;
 import java.io.InputStream;

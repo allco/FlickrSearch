@@ -1,4 +1,4 @@
-package com.allco.flickrsearch.rest.model;
+package com.allco.flickrsearch.rest;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  * Example of JSON can be found here: https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=588459f7180bc9126823d9a2e6ba6637&text=android&format=json&nojsoncallback=1
  */
 
-public class FlickrModel {
+public class FlickrItemData {
 
 	static class PhotosContainer {
 		int total;

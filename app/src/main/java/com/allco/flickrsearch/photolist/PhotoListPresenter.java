@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,46 +15,52 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.allco.flickrsearch.R;
-import com.allco.flickrsearch.ioc.IoC;
+import com.allco.flickrsearch.photodetails.PhotoDetailsActivity;
 import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
+import com.allco.flickrsearch.photolist.view.PhotoListAdapter;
+import com.allco.flickrsearch.photolist.view.PhotoListFragment;
+import com.allco.flickrsearch.photolist.view.PhotoListItemData;
+import com.allco.flickrsearch.rest.FlickrItemData;
 import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 
-import java.lang.ref.WeakReference;
+import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
-import static com.allco.flickrsearch.photolist.PhotoListFragment.ARG_SEARCH_REQ;
+import static com.allco.flickrsearch.photolist.view.PhotoListFragment.ARG_SEARCH_REQ;
 
 @PhotoListScope
 public class PhotoListPresenter {
 
+    @NonNull
     private final Context context;
+    @NonNull
+    private PhotoListAdapter listAdapter;
+    @NonNull
+    private PhotoListModel photoListModel;
 
     private String searchRequest;
-    private PhotoListAdapter listAdapter;
+    private PhotoListFragment fragment;
     private MenuItem menuItemRefresh;
     private ListView listView;
-    private PhotoListFragment fragment;
 
     public interface Listener {
         void onRequestChanged(String searchRequest);
     }
 
     @Inject
-    public PhotoListPresenter(Context context, PhotoListAdapter adapter) {
+    public PhotoListPresenter(@NonNull Context context, @NonNull PhotoListAdapter adapter, @NonNull PhotoListModel photoListModel) {
         this.context = context;
         this.listAdapter = adapter;
+        this.photoListModel = photoListModel;
     }
 
-    void init(@NonNull PhotoListFragment fragment) {
+    public void init(@NonNull PhotoListFragment fragment) {
         this.fragment = fragment;
         listView = fragment.getListView();
+
         Bundle arguments = fragment.getArguments();
         searchRequest = arguments == null ? "" : arguments.getString(ARG_SEARCH_REQ);
-
-        // reset searchRequest at MainActivity
-        tryResetMainActivity();
 
         // if empty searchRequest
         if (TextUtils.isEmpty(searchRequest)) {
@@ -62,19 +69,22 @@ public class PhotoListPresenter {
         }
 
         listView.setOnItemClickListener(
-                (parent, view, position, id) ->
-                        PhotoViewerActivity.start(listView.getContext(),
-                                listAdapter.getItemTitle(position),
-                                listAdapter.getItemPhotoUrl(position)
-                        ));
+                (parent, view, position, id) -> {
+                    PhotoListItemData photoData = listAdapter.getItem(position);
+                    PhotoDetailsActivity.start(listView.getContext(), photoData.getTitle(), photoData.getImageUrl());
+                }
+        );
 
-        //create and setup adapter
-        listAdapter.setListener(createAdapterListener(new WeakReference<>(this)));
-        setListAdapter(listAdapter.reset(searchRequest, true));
-        fragment.setListShownNoAnimation(false);
+        refresh(true);
     }
 
-    void destroy() {
+    public void onResume() {
+        // reset searchRequest at MainActivity
+        tryResetMainActivity();
+    }
+
+    public void destroy() {
+        photoListModel.destroy();
     }
 
     private void tryResetMainActivity() {
@@ -85,7 +95,6 @@ public class PhotoListPresenter {
     }
 
     private void setListAdapter(ListAdapter adapter) {
-
         // if adapter handles scrolling
         if (adapter instanceof AbsListView.OnScrollListener) {
             listView.setOnScrollListener((AbsListView.OnScrollListener) adapter);
@@ -101,47 +110,6 @@ public class PhotoListPresenter {
         fragment.setListAdapter(adapter);
     }
 
-    private static PhotoListAdapter.Listener createAdapterListener(WeakReference<PhotoListPresenter> refPresenter) {
-
-        return new PhotoListAdapter.Listener() {
-
-            @Override
-            public void onPageLoaded(PhotoListAdapter adapter) {
-                PhotoListPresenter presenter = refPresenter.get();
-                if (presenter == null) {
-                    return;
-                }
-                presenter.onPageLoaded(adapter);
-            }
-
-            @Override
-            public void onError(PhotoListAdapter adapter) {
-                PhotoListPresenter presenter = refPresenter.get();
-                if (presenter == null) {
-                    return;
-                }
-                presenter.onError(adapter);
-            }
-        };
-    }
-
-    private void onPageLoaded(PhotoListAdapter adapter) {
-        if (adapter.isFinished() && adapter.getCount() < 1) {
-            showMessage(R.string.nothing_found_try_other_request, false);
-        } else {
-            if (menuItemRefresh != null) {
-                menuItemRefresh.setVisible(true);
-            }
-            fragment.setListShown(true);
-        }
-    }
-
-    private void onError(PhotoListAdapter adapter) {
-        if (adapter.getCount() <= 0) {
-            showMessage(R.string.error_occurred, true);
-        }
-    }
-
     private void showMessage(int resId, boolean showRefresh) {
 
         if (menuItemRefresh != null && menuItemRefresh.isVisible() != showRefresh) {
@@ -153,28 +121,49 @@ public class PhotoListPresenter {
         fragment.setListShownNoAnimation(true);
     }
 
-    String getSearchRequest() {
+    public String getSearchRequest() {
         return searchRequest;
     }
 
-    boolean isIdleNow() {
-        return listAdapter == null || listAdapter.isIdleNow();
-    }
-
-    void inflateMenu(Menu menu, MenuInflater inflater) {
+    public void inflateMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_photolist, menu);
         menuItemRefresh = menu.findItem(R.id.action_refresh);
         menuItemRefresh.setOnMenuItemClickListener(item -> {
-            refresh();
+            refresh(false);
             return true;
         });
     }
 
-    private void refresh() {
-        if (listAdapter != null) {
-            fragment.setListShown(false);
-            listAdapter.reset(searchRequest, false);
-            tryResetMainActivity();
+    private void refresh(boolean allowCache) {
+        tryResetMainActivity();
+        photoListModel.reset(searchRequest, allowCache);
+        Runnable loadNextPage =
+                () -> photoListModel.tryLoadNextPage(false,
+                        this::onPageLoaded,
+                        () -> showMessage(R.string.error_occurred, true));
+
+        // link adapter with model
+        listAdapter.reset(() -> !photoListModel.isFinished(), loadNextPage);
+
+        setListAdapter(listAdapter);
+        fragment.setListShown(false);
+
+        loadNextPage.run();
+    }
+
+    private void onPageLoaded(@Nullable final List<FlickrItemData.Entry> entries) {
+        if (entries == null || entries.isEmpty()) {
+            if (photoListModel.isFinished() && listAdapter.getCount() < 1) {
+                showMessage(R.string.nothing_found_try_other_request, false);
+            }
+        } else {
+            listAdapter.addData(PhotoListItemData.map(entries));
+
+            if (menuItemRefresh != null) {
+                menuItemRefresh.setVisible(true);
+            }
+
+            fragment.setListShownNoAnimation(true);
         }
     }
 }

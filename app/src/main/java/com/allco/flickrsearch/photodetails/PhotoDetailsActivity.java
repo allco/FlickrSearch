@@ -1,4 +1,4 @@
-package com.allco.flickrsearch.photolist;
+package com.allco.flickrsearch.photodetails;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,20 +20,20 @@ import com.squareup.picasso.Picasso;
 /**
  * Activity that implements Entry viewer
  */
-public class PhotoViewerActivity extends AppCompatActivity {
+public class PhotoDetailsActivity extends AppCompatActivity {
 
     private static final java.lang.String ARG_IMAGE_URL = "ARG_IMAGE_URL";
     private static final java.lang.String ARG_IMAGE_TITLE = "ARG_IMAGE_TITLE";
 
     /**
-     * Starts PhotoViewerActivity. All arguments are required
+     * Starts PhotoDetailsActivity. All arguments are required
      *
      * @param ctx   Context
      * @param title title of Entry
      * @param url   photos URL of Entry
      */
     public static void start(@NonNull Context ctx, @NonNull String title, @Nullable String url) {
-        Intent intent = new Intent(ctx, PhotoViewerActivity.class);
+        Intent intent = new Intent(ctx, PhotoDetailsActivity.class);
         intent.putExtra(ARG_IMAGE_URL, url);
         intent.putExtra(ARG_IMAGE_TITLE, title);
         ctx.startActivity(intent);

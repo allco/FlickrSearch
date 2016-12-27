@@ -4,7 +4,7 @@ import android.app.Application;
 
 import com.allco.flickrsearch.ioc.IoC;
 
-public class FlickrSearchApplication extends Application {
+public class FlickrsearchApplication extends Application {
 
     @Override
     public void onCreate() {

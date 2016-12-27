@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.support.v4.content.res.ResourcesCompat;
 
 import com.allco.flickrsearch.R;
-import com.allco.flickrsearch.photolist.PhotoListPresenter;
 import com.allco.flickrsearch.utils.BitmapBorderTransformer;
 
 import javax.inject.Named;
@@ -13,11 +12,12 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 
+import static com.allco.flickrsearch.photolist.view.PhotoListAdapter.THUMB_SIZE;
+
 @SuppressWarnings("WeakerAccess")
 @Module
 public class PhotoListModule {
 
-    public static final String THUMB_SIZE = "THUMB_SIZE";
 
     @PhotoListScope
     @Named(THUMB_SIZE)
