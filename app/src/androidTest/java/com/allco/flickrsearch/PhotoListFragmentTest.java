@@ -18,7 +18,6 @@ import com.allco.flickrsearch.ioc.ApplicationModule;
 import com.allco.flickrsearch.ioc.IoC;
 import com.allco.flickrsearch.photolist.PhotoListModel;
 import com.allco.flickrsearch.photolist.view.PhotoListFragment;
-import com.allco.flickrsearch.rest.RestClient;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 
@@ -79,12 +78,8 @@ public class PhotoListFragmentTest {
             endPoint = server.url("/").toString();
             Context context = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
             mockitoRule = new DaggerMockRule<>(ApplicationComponent.class, new ApplicationModule(context))
-                    .set(new DaggerMockRule.ComponentSetter<ApplicationComponent>() {
-                        @Override
-                        public void setComponent(final ApplicationComponent applicationComponent) {
-                            IoC.getInstance().setApplicationComponent(applicationComponent);
-                            RestClient restClient = applicationComponent.restClient();
-                        }
+                    .set(applicationComponent -> {
+                        IoC.getInstance().setApplicationComponent(applicationComponent);
                     });
         } catch (IOException e) {
             e.printStackTrace();
