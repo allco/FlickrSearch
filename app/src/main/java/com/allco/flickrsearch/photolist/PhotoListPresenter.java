@@ -8,14 +8,17 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import com.allco.flickrsearch.R;
+import com.allco.flickrsearch.photodetails.PhotoDetailsActivity;
 import com.allco.flickrsearch.photolist.ioc.PhotoListModule;
 import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
 import com.allco.flickrsearch.photolist.view.PhotoListAdapter;
 import com.allco.flickrsearch.photolist.view.PhotoListFragment;
 import com.allco.flickrsearch.photolist.view.PhotoListItemData;
 import com.allco.flickrsearch.rest.FlickrItemData;
+import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 
 import java.util.List;
 
@@ -57,6 +60,27 @@ public class PhotoListPresenter {
     }
 
     public void start() {
+
+        ListView listView = fragment.getListView();
+        // lets rise an exception as early as possible in case of fatal errors
+        if (listView == null) {
+            throw new IllegalStateException("ListView should not be null");
+        }
+
+        SwingBottomInAnimationAdapter animatedAdapter = new SwingBottomInAnimationAdapter(listAdapter);
+        animatedAdapter.setAbsListView(listView);
+
+        listView.setOnScrollListener(listAdapter);
+
+        listView.setOnItemClickListener(
+                (parent, view, position, id) -> {
+                    PhotoListItemData photoData = listAdapter.getItem(position);
+                    PhotoDetailsActivity.start(listView.getContext(), photoData.getTitle(), photoData.getImageUrl());
+                }
+        );
+
+        listView.setAdapter(animatedAdapter);
+
         // if empty searchRequest
         if (TextUtils.isEmpty(searchRequest)) {
             showMessage(R.string.please_enter_text_search, false);

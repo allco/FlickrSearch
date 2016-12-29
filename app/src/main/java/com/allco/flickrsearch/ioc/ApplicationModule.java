@@ -24,6 +24,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    @NonNull
     public Context provideApplicationContext() {return appContext;}
 
     @Provides
