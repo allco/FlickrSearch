@@ -1,7 +1,6 @@
 package com.allco.flickrsearch.ioc;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import javax.inject.Named;
@@ -26,10 +25,6 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public Context provideApplicationContext() {return appContext;}
-
-    @Provides
-    @Singleton
-    public Resources provideResources(Context context) {return context.getResources();}
 
     @Provides
     @Singleton

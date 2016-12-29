@@ -2,32 +2,25 @@ package com.allco.flickrsearch.photolist;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import com.allco.flickrsearch.R;
-import com.allco.flickrsearch.photodetails.PhotoDetailsActivity;
+import com.allco.flickrsearch.photolist.ioc.PhotoListModule;
 import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
 import com.allco.flickrsearch.photolist.view.PhotoListAdapter;
 import com.allco.flickrsearch.photolist.view.PhotoListFragment;
 import com.allco.flickrsearch.photolist.view.PhotoListItemData;
 import com.allco.flickrsearch.rest.FlickrItemData;
-import com.nhaarman.listviewanimations.appearance.simple.SwingBottomInAnimationAdapter;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import static com.allco.flickrsearch.photolist.view.PhotoListFragment.ARG_SEARCH_REQ;
+import javax.inject.Named;
 
 @PhotoListScope
 public class PhotoListPresenter {
@@ -38,53 +31,47 @@ public class PhotoListPresenter {
     private PhotoListAdapter listAdapter;
     @NonNull
     private PhotoListModel photoListModel;
-
+    @Nullable
     private String searchRequest;
+    @NonNull
     private PhotoListFragment fragment;
+
     private MenuItem menuItemRefresh;
-    private ListView listView;
 
     public interface Listener {
         void onRequestChanged(String searchRequest);
     }
 
     @Inject
-    public PhotoListPresenter(@NonNull Context context, @NonNull PhotoListAdapter adapter, @NonNull PhotoListModel photoListModel) {
+    public PhotoListPresenter(
+            @NonNull Context context,
+            @NonNull PhotoListFragment fragment,
+            @NonNull PhotoListAdapter adapter,
+            @NonNull PhotoListModel photoListModel,
+            @Nullable @Named(PhotoListModule.SEARCH_REQUEST) String searchRequest) {
         this.context = context;
+        this.fragment = fragment;
         this.listAdapter = adapter;
         this.photoListModel = photoListModel;
+        this.searchRequest = searchRequest;
     }
 
-    public void init(@NonNull PhotoListFragment fragment) {
-        this.fragment = fragment;
-        listView = fragment.getListView();
-
-        Bundle arguments = fragment.getArguments();
-        searchRequest = arguments == null ? "" : arguments.getString(ARG_SEARCH_REQ);
-
+    public void start() {
         // if empty searchRequest
         if (TextUtils.isEmpty(searchRequest)) {
             showMessage(R.string.please_enter_text_search, false);
-            return;
+        } else {
+            refresh(true);
         }
+    }
 
-        listView.setOnItemClickListener(
-                (parent, view, position, id) -> {
-                    PhotoListItemData photoData = listAdapter.getItem(position);
-                    PhotoDetailsActivity.start(listView.getContext(), photoData.getTitle(), photoData.getImageUrl());
-                }
-        );
-
-        refresh(true);
+    public void destroy() {
+        photoListModel.destroy();
     }
 
     public void onResume() {
         // reset searchRequest at MainActivity
         tryResetMainActivity();
-    }
-
-    public void destroy() {
-        photoListModel.destroy();
     }
 
     private void tryResetMainActivity() {
@@ -94,35 +81,14 @@ public class PhotoListPresenter {
         }
     }
 
-    private void setListAdapter(ListAdapter adapter) {
-        // if adapter handles scrolling
-        if (adapter instanceof AbsListView.OnScrollListener) {
-            listView.setOnScrollListener((AbsListView.OnScrollListener) adapter);
-        }
-
-        // add item appearing animation
-        if (adapter instanceof BaseAdapter) {
-            SwingBottomInAnimationAdapter animationAdapter = new SwingBottomInAnimationAdapter((BaseAdapter) adapter);
-            animationAdapter.setAbsListView(listView);
-            adapter = animationAdapter;
-        }
-
-        fragment.setListAdapter(adapter);
-    }
-
     private void showMessage(int resId, boolean showRefresh) {
 
         if (menuItemRefresh != null && menuItemRefresh.isVisible() != showRefresh) {
             menuItemRefresh.setVisible(showRefresh);
         }
 
-        setListAdapter(null);
         fragment.setEmptyText(context.getString(resId));
         fragment.setListShownNoAnimation(true);
-    }
-
-    public String getSearchRequest() {
-        return searchRequest;
     }
 
     public void inflateMenu(Menu menu, MenuInflater inflater) {
@@ -144,8 +110,6 @@ public class PhotoListPresenter {
 
         // link adapter with model
         listAdapter.reset(() -> !photoListModel.isFinished(), loadNextPage);
-
-        setListAdapter(listAdapter);
         fragment.setListShown(false);
 
         loadNextPage.run();

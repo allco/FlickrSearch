@@ -10,6 +10,7 @@ import android.view.View;
 import com.allco.flickrsearch.ioc.IoC;
 import com.allco.flickrsearch.photolist.PhotoListPresenter;
 import com.allco.flickrsearch.photolist.ioc.PhotoListComponent;
+import com.allco.flickrsearch.photolist.ioc.PhotoListModule;
 
 import javax.inject.Inject;
 
@@ -18,7 +19,7 @@ import javax.inject.Inject;
  */
 public class PhotoListFragment extends ListFragment {
 
-    public final static String ARG_SEARCH_REQ = "ARG_SEARCH_REQ";
+    private final static String ARG_SEARCH_REQ = "ARG_SEARCH_REQ";
 
     @Inject
     PhotoListPresenter presenter;
@@ -39,11 +40,11 @@ public class PhotoListFragment extends ListFragment {
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        photoListComponent = IoC.getInstance().getApplicationComponent().photoListComponent();
+        photoListComponent = IoC.getInstance().getApplicationComponent().photoListComponent(new PhotoListModule(this, getSearchRequest()));
         photoListComponent.inject(this);
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
-        presenter.init(this);
+        presenter.start();
     }
 
     @Override
@@ -72,6 +73,7 @@ public class PhotoListFragment extends ListFragment {
 
     @Nullable
     public String getSearchRequest() {
-        return presenter == null ? null : presenter.getSearchRequest();
+        Bundle arguments = getArguments();
+        return arguments == null ? "" : arguments.getString(ARG_SEARCH_REQ);
     }
 }

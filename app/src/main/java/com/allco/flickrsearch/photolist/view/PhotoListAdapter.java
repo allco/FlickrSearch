@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.allco.flickrsearch.R;
-import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
 import com.allco.flickrsearch.utils.BitmapBorderTransformer;
 import com.allco.flickrsearch.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -23,12 +22,8 @@ import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-@PhotoListScope
 public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener {
 
     public static final String THUMB_SIZE = "THUMB_SIZE";
@@ -64,10 +59,9 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         boolean get();
     }
 
-    @Inject
-    PhotoListAdapter(@NonNull Context ctx,
-                     @NonNull BitmapBorderTransformer bitmapTransformer,
-                     @Named(THUMB_SIZE) @IntRange(from = 1) int sizeThumbPixels) {
+    public PhotoListAdapter(@NonNull Context ctx,
+                            @NonNull BitmapBorderTransformer bitmapTransformer,
+                            @IntRange(from = 1) int sizeThumbPixels) {
         this.ctx = ctx;
         this.sBitmapTransformer = bitmapTransformer;
         this.sizeThumbPixels = sizeThumbPixels;

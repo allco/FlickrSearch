@@ -63,6 +63,8 @@ public class PhotoListFragmentTest {
 
     // a local Web-server
     private MockWebServer server = new MockWebServer();
+
+    @Named("ignore_field")
     private String mockedResponseBody;
 
     @Named(END_POINT)
@@ -177,6 +179,7 @@ public class PhotoListFragmentTest {
 
         PhotoListFragment photosFragment = activityRule.getActivity().getCurrentPhotosFragment();
         assertNotNull(photosFragment);
+
         PhotoListModel model = photosFragment.getPhotoListComponent().model();
 
         return new IdlingResourceImpl(model::isIdle);
