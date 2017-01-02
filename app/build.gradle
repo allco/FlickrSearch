@@ -9,8 +9,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    compileSdkVersion 24
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     def APP_ID_PREFIX = "com.allco.flickrsearch"
 
@@ -143,9 +143,9 @@ def changeOutputFilename(outputTask, newNamePrefix, version) {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:support-annotations:24.2.1'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-annotations:25.1.0'
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta3'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
 
@@ -157,19 +157,25 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'javax.inject:javax.inject:1'
 
+
     testCompile 'junit:junit:4.12'
     testCompile 'com.squareup.okhttp:mockwebserver:2.5.0'
-    testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile "org.mockito:mockito-core:2.2.8"
     testCompile 'com.github.fabioCollini:DaggerMock:0.6.2'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.4'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.4'
+    testCompile 'com.flextrade.jfixture:jfixture:2.6.3'
 
-    androidTestCompile 'com.android.support:appcompat-v7:24.2.1'
+    androidTestCompile 'com.android.support:appcompat-v7:25.1.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.squareup.okhttp:mockwebserver:2.5.0'
     androidTestCompile 'com.github.fabioCollini:DaggerMock:0.6.2'
+    androidTestCompile 'com.flextrade.jfixture:jfixture:2.6.3'
 
-    androidTestCompile 'org.mockito:mockito-core:2.2.8'
+
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'com.linkedin.dexmaker:dexmaker-mockito:2.2.0'
 }

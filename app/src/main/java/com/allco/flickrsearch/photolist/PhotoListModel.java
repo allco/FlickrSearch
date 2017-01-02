@@ -3,22 +3,21 @@ package com.allco.flickrsearch.photolist;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
-import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
 import com.allco.flickrsearch.rest.FlickrItemData;
 import com.allco.flickrsearch.rest.RestClient;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-@PhotoListScope
+import static android.support.annotation.VisibleForTesting.PACKAGE_PRIVATE;
+
 public class PhotoListModel {
 
     private static final String TAG = "PhotoListModel";
@@ -50,12 +49,11 @@ public class PhotoListModel {
     private boolean isFinished = false; // true when all data pages is loaded or error occurred
     private String request; // The search request.
 
-    @Inject
     public PhotoListModel(@NonNull RestClient restClient) {
         this.restClient = restClient;
     }
 
-    public void reset(String request, boolean allowCachedContent) {
+    void reset(String request, boolean allowCachedContent) {
 
         destroy();
         lastLoadedPageNumber = 0;
@@ -65,11 +63,12 @@ public class PhotoListModel {
         this.request = request;
     }
 
+    @VisibleForTesting(otherwise = PACKAGE_PRIVATE)
     public boolean isFinished() {
         return isFinished;
     }
 
-    public void destroy() {
+    void destroy() {
         if (currentCall != null) {
             // the cancellation does not work still
             // https://github.com/square/retrofit/issues/1085

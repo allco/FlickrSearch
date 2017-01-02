@@ -25,11 +25,11 @@ import retrofit.Response;
 import static com.allco.flickrsearch.ioc.ApplicationModule.END_POINT;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mockito.Mockito.mock;
 
 public class RestClientTest {
@@ -60,7 +60,6 @@ public class RestClientTest {
 
             mockitoRule = new DaggerMockRule<>(ApplicationComponent.class, new ApplicationModule(mock(FlickrsearchApplication.class)))
                     .set(applicationComponent -> restClient = applicationComponent.restClient());
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,7 +95,7 @@ public class RestClientTest {
         assertThat("response != null", response, notNullValue());
         assertThat("response is 200", response.code(), is(200));
 
-        // reponse should contain valid body
+        // response should contain valid body
         FlickrItemData model = response.body();
         assertThat("model != null", model, notNullValue());
 

@@ -6,10 +6,11 @@ import android.support.v4.app.ListFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.ListView;
 
 import com.allco.flickrsearch.ioc.IoC;
 import com.allco.flickrsearch.photolist.PhotoListPresenter;
-import com.allco.flickrsearch.photolist.ioc.PhotoListComponent;
+import com.allco.flickrsearch.photolist.ioc.PhotoListModule;
 
 import javax.inject.Inject;
 
@@ -18,11 +19,10 @@ import javax.inject.Inject;
  */
 public class PhotoListFragment extends ListFragment {
 
-    public final static String ARG_SEARCH_REQ = "ARG_SEARCH_REQ";
+    private final static String ARG_SEARCH_REQ = "ARG_SEARCH_REQ";
 
     @Inject
     PhotoListPresenter presenter;
-    private PhotoListComponent photoListComponent;
 
     @Deprecated
     public PhotoListFragment() {
@@ -39,11 +39,19 @@ public class PhotoListFragment extends ListFragment {
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        photoListComponent = IoC.getInstance().getApplicationComponent().photoListComponent();
-        photoListComponent.inject(this);
+        PhotoListPresenter.Listener listener = (PhotoListPresenter.Listener) getActivity();
+        IoC.getInstance().getApplicationComponent().photoListComponent(new PhotoListModule(this, listener, getSearchRequest())).inject(this);
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
-        presenter.init(this);
+
+        ListView listView = getListView();
+        // lets rise an exception as early as possible in case of fatal errors
+        if (listView == null) {
+            throw new IllegalStateException("ListView should not be null");
+        }
+
+        presenter.attach(listView);
+        presenter.startRequesting();
     }
 
     @Override
@@ -62,16 +70,12 @@ public class PhotoListFragment extends ListFragment {
     public void onDestroyView() {
         presenter.destroy();
         presenter = null;
-        photoListComponent = null;
         super.onDestroyView();
-    }
-
-    public PhotoListComponent getPhotoListComponent() {
-        return photoListComponent;
     }
 
     @Nullable
     public String getSearchRequest() {
-        return presenter == null ? null : presenter.getSearchRequest();
+        Bundle arguments = getArguments();
+        return arguments == null ? "" : arguments.getString(ARG_SEARCH_REQ);
     }
 }

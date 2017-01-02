@@ -9,7 +9,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-
 @SuppressWarnings("WeakerAccess")
 @Module
 public class ApplicationModule {
@@ -25,11 +24,14 @@ public class ApplicationModule {
     @Provides
     @Singleton
     @NonNull
-    public Context provideApplicationContext() {return appContext;}
-
+    public Context provideApplicationContext() {
+        return appContext;
+    }
 
     @Provides
     @Singleton
     @Named(END_POINT)
-    public String provideFlickrSearchEndPoint() {return "https://api.flickr.com";}
+    public String provideFlickrSearchEndPoint() {
+        return "https://api.flickr.com";
+    }
 }
