@@ -2,7 +2,6 @@ package com.allco.flickrsearch.photolist.view;
 
 import android.content.Context;
 import android.support.annotation.IntDef;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -14,22 +13,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.allco.flickrsearch.R;
-import com.allco.flickrsearch.photolist.ioc.PhotoListScope;
-import com.allco.flickrsearch.utils.BitmapBorderTransformer;
+import com.allco.flickrsearch.utils.ImageLoader;
 import com.allco.flickrsearch.utils.Utils;
-import com.squareup.picasso.Picasso;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import static com.allco.flickrsearch.photolist.ioc.PhotoListModule.THUMB_SIZE;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-@PhotoListScope
 public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrollListener {
 
     // limit fot total count of items
@@ -37,7 +29,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
     private static final int TYPE_REGULAR = 0;
     private static final int TYPE_SPINNER = 1;
-    public static final int TYPE_COUNT = 2;
+    private static final int TYPE_COUNT = 2;
     @Nullable
     private GetMorePagesAvailable getMorePagesAvailable;
     @Nullable
@@ -45,15 +37,13 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
     @Retention(SOURCE)
     @IntDef({TYPE_REGULAR, TYPE_SPINNER})
-    public @interface TypeItem {
+    @interface TypeItem {
     }
-
-    private final int sizeThumbPixels;
 
     @NonNull
     private final Context ctx;
     @NonNull
-    private final BitmapBorderTransformer sBitmapTransformer;
+    private ImageLoader imageLoader;
 
     private ArrayList<PhotoListItemData> listEntries;
 
@@ -61,13 +51,10 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
         boolean get();
     }
 
-    @Inject
-    PhotoListAdapter(@NonNull Context ctx,
-                     @NonNull BitmapBorderTransformer bitmapTransformer,
-                     @Named(THUMB_SIZE) @IntRange(from = 1) int sizeThumbPixels) {
+    public PhotoListAdapter(@NonNull Context ctx,
+                            @NonNull ImageLoader imageLoader) {
         this.ctx = ctx;
-        this.sBitmapTransformer = bitmapTransformer;
-        this.sizeThumbPixels = sizeThumbPixels;
+        this.imageLoader = imageLoader;
     }
 
     public void reset(@NonNull GetMorePagesAvailable getMorePagesAvailable, @NonNull Runnable requestNextPage) {
@@ -120,17 +107,7 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
         // if URL exists, then load image
         if (!TextUtils.isEmpty(imageUrl)) {
-
-            Picasso.with(ctx)
-                    .load(imageUrl)
-                    .error(R.drawable.thumb_stub)
-                    .placeholder(R.drawable.thumb_stub)
-                    .resize(sizeThumbPixels, sizeThumbPixels)
-                    .transform(sBitmapTransformer)
-                    .centerCrop()
-                    .tag(ctx)
-                    .into(h.icon);
-
+            imageLoader.loadImage(h.icon, imageUrl);
             h.icon.setVisibility(View.VISIBLE);
         } else {
             // or hide imageView
@@ -198,16 +175,15 @@ public class PhotoListAdapter extends BaseAdapter implements AbsListView.OnScrol
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-        final Picasso picasso = Picasso.with(ctx);
         if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-            picasso.resumeTag(ctx);
+            imageLoader.resume();
         } else {
-            picasso.pauseTag(ctx);
+            imageLoader.pause();
         }
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    public void onScroll(final AbsListView view, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
+
     }
 }

@@ -1,13 +1,14 @@
 package com.allco.flickrsearch.photolist;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.allco.flickrsearch.R;
@@ -35,6 +36,8 @@ public class PhotoListPresenter {
     @NonNull
     private PhotoListModel photoListModel;
     @Nullable
+    private Listener listener;
+    @Nullable
     private String searchRequest;
     @NonNull
     private PhotoListFragment fragment;
@@ -51,36 +54,35 @@ public class PhotoListPresenter {
             @NonNull PhotoListFragment fragment,
             @NonNull PhotoListAdapter adapter,
             @NonNull PhotoListModel photoListModel,
+            @Nullable Listener listener,
             @Nullable @Named(PhotoListModule.SEARCH_REQUEST) String searchRequest) {
         this.context = context;
         this.fragment = fragment;
         this.listAdapter = adapter;
         this.photoListModel = photoListModel;
         this.searchRequest = searchRequest;
+        this.listener = listener;
     }
 
-    public void start() {
-
-        ListView listView = fragment.getListView();
-        // lets rise an exception as early as possible in case of fatal errors
-        if (listView == null) {
-            throw new IllegalStateException("ListView should not be null");
-        }
-
+    public void attach(@NonNull final ListView listView) {
         SwingBottomInAnimationAdapter animatedAdapter = new SwingBottomInAnimationAdapter(listAdapter);
         animatedAdapter.setAbsListView(listView);
-
         listView.setOnScrollListener(listAdapter);
-
-        listView.setOnItemClickListener(
-                (parent, view, position, id) -> {
-                    PhotoListItemData photoData = listAdapter.getItem(position);
-                    PhotoDetailsActivity.start(listView.getContext(), photoData.getTitle(), photoData.getImageUrl());
-                }
-        );
-
+        listView.setOnItemClickListener(createOnItemClickListener());
         listView.setAdapter(animatedAdapter);
+    }
 
+    @NonNull
+    @VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    protected AdapterView.OnItemClickListener createOnItemClickListener() {
+        return (parent, view, position, id) -> {
+            PhotoListItemData photoData = listAdapter.getItem(position);
+            context.startActivity(PhotoDetailsActivity.createIntent(context, photoData.getTitle(), photoData.getImageUrl()));
+        };
+    }
+
+    public void startRequesting() {
         // if empty searchRequest
         if (TextUtils.isEmpty(searchRequest)) {
             showMessage(R.string.please_enter_text_search, false);
@@ -94,18 +96,14 @@ public class PhotoListPresenter {
     }
 
     public void onResume() {
-        // reset searchRequest at MainActivity
-        tryResetMainActivity();
-    }
-
-    private void tryResetMainActivity() {
-        Activity activity = fragment.getActivity();
-        if (activity instanceof PhotoListPresenter.Listener) {
-            ((PhotoListPresenter.Listener) activity).onRequestChanged(searchRequest);
+        if (listener != null) {
+            listener.onRequestChanged(searchRequest);
         }
     }
 
-    private void showMessage(int resId, boolean showRefresh) {
+    @VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    protected void showMessage(int resId, boolean showRefresh) {
 
         if (menuItemRefresh != null && menuItemRefresh.isVisible() != showRefresh) {
             menuItemRefresh.setVisible(showRefresh);
@@ -124,22 +122,32 @@ public class PhotoListPresenter {
         });
     }
 
-    private void refresh(boolean allowCache) {
-        tryResetMainActivity();
+    @VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    protected void refresh(boolean allowCache) {
+        onResume();
         photoListModel.reset(searchRequest, allowCache);
-        Runnable loadNextPage =
-                () -> photoListModel.tryLoadNextPage(false,
-                        this::onPageLoaded,
-                        () -> showMessage(R.string.error_occurred, true));
+        Runnable nextPageLoader = createNextPageLoader();
 
         // link adapter with model
-        listAdapter.reset(() -> !photoListModel.isFinished(), loadNextPage);
+        listAdapter.reset(() -> !photoListModel.isFinished(), nextPageLoader);
         fragment.setListShown(false);
 
-        loadNextPage.run();
+        nextPageLoader.run();
     }
 
-    private void onPageLoaded(@Nullable final List<FlickrItemData.Entry> entries) {
+    @NonNull
+    @VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    protected Runnable createNextPageLoader() {
+        return () -> photoListModel.tryLoadNextPage(false,
+                this::onPageLoaded,
+                () -> showMessage(R.string.error_occurred, true));
+    }
+
+    @VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    protected void onPageLoaded(@Nullable final List<FlickrItemData.Entry> entries) {
         if (entries == null || entries.isEmpty()) {
             if (photoListModel.isFinished() && listAdapter.getCount() < 1) {
                 showMessage(R.string.nothing_found_try_other_request, false);

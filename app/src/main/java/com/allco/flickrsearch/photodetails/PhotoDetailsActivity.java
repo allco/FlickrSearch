@@ -9,39 +9,44 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.allco.flickrsearch.R;
-import com.squareup.picasso.Picasso;
+import com.allco.flickrsearch.ioc.IoC;
+import com.allco.flickrsearch.photodetails.ioc.PhotoDetailsModule;
+import com.allco.flickrsearch.utils.ImageLoader;
+
+import javax.inject.Inject;
 
 /**
- * Activity that implements Entry viewer
+ * Activity that implements Entry viewer.
  */
 public class PhotoDetailsActivity extends AppCompatActivity {
+
+    @Inject
+    ImageLoader imageLoader;
 
     private static final java.lang.String ARG_IMAGE_URL = "ARG_IMAGE_URL";
     private static final java.lang.String ARG_IMAGE_TITLE = "ARG_IMAGE_TITLE";
 
     /**
-     * Starts PhotoDetailsActivity. All arguments are required
-     *
-     * @param ctx   Context
+     * Creates an Intent in order to start PhotoDetailsActivity. All arguments are required.
+     * @param context   Context
      * @param title title of Entry
      * @param url   photos URL of Entry
      */
-    public static void start(@NonNull Context ctx, @NonNull String title, @Nullable String url) {
-        Intent intent = new Intent(ctx, PhotoDetailsActivity.class);
+    public static Intent createIntent(@NonNull Context context, @NonNull String title, @Nullable String url) {
+        Intent intent = new Intent(context, PhotoDetailsActivity.class);
         intent.putExtra(ARG_IMAGE_URL, url);
         intent.putExtra(ARG_IMAGE_TITLE, title);
-        ctx.startActivity(intent);
+        return intent;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        IoC.getInstance().getApplicationComponent().photoDetailsComponent(new PhotoDetailsModule()).inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_viewer);
 
@@ -69,15 +74,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
 
         // if Entry's photo URL is not empty, load image
         if (!TextUtils.isEmpty(url)) {
-
-            DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
-            int szImage = displayMetrics.widthPixels;
-
-            Picasso.with(this)
-                    .load(url)
-                    .resize(szImage, szImage) // fit image to square
-                    .centerInside()
-                    .into(ivImage);
+            imageLoader.loadImage(ivImage, url);
         }
     }
 
