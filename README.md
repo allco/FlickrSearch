@@ -1,21 +1,21 @@
 # FlickrSearch
 A simple Flickr browser.
-This is an example of Android application and example os some techniques for automated testing (final tests coverage is insufficient for real applications).
+This is an example of Android application based on MVP architecture and example os some techniques for automated testing (final tests coverage is insufficient for real applications).
 
-FlickrSearch takes your search request and asks Flickr for public photos relevant to that request and shows the result in ListView. 
+FlickrSearch takes your search request and asks Flickr for public photos relevant to that request and shows the result in ListView.
 Each ListView's item can be clicked to open in dedicated Activity with title and photo (Flickr didn't provide description).
 
 Cache
 -----
-Disk cache for network responses is used in this application. 
-Every time when a search request is given, the Cache is checked for stored responses with URL as a key. 
-If stored response exists then it will be used and no network transmission happened.  
+Disk cache for network responses is used in this application.
+Every time when a search request is given, the Cache is checked for stored responses with URL as a key.
+If stored response exists then it will be used and no network transmission happened.
 
 If "Refresh" button is pressed then the Cache won't be used.
 The expiration time for responses in the Cache for online mode is stored at RestClient.CACHE_EXPIRATION_TIME (1 hour by default).
 
-The **offline mode** (when Internet connection is unavailable) is supported. 
-Stored responses will be used if they exists else a error message will appear. 
+The **offline mode** (when Internet connection is unavailable) is supported.
+Stored responses will be used if they exists else a error message will appear.
 The expiration time for offline mode is stored at RestClient.CACHE_STALE_TOLERANCE (1 day by default).
 
 -----
@@ -28,8 +28,8 @@ Run command (do not forget setup ANDROID_HOME environment variable):
 * for Purple flavor:
     * `./gradlew installPurpleColoredRelease` # on Linux, MacOS
     * `./gradlew.bat installPurpleColoredRelease` # on Windows
-    
-* or for Green flavor:   
+
+* or for Green flavor:
     * `./gradlew installGreenColoredRelease` # on Linux, MacOS
     * `./gradlew.bat installGreenColoredRelease` # on Windows
 
@@ -47,6 +47,11 @@ Run command (do not forget setup ANDROID_HOME environment variable):
 * `./gradlew test` # on Linux, MacOS
 * `./gradlew.bat test` # on Windows
 
+**To uninstall everything:**
+
+* `./gradlew unintsallAll` # on Linux, MacOS
+* `./gradlew.bat unintsallAll` # on Windows
+
 ------
 
 **Used 3d party Libraries:**
@@ -59,6 +64,9 @@ Run command (do not forget setup ANDROID_HOME environment variable):
 **For tests:**
 
 * Espresso https://google.github.io/android-testing-support-library/
+* Mockito http://site.mockito.org/
+* PowerMock http://powermock.github.io/
 * JUnit4 http://junit.org/
 * Hamcrest http://hamcrest.org/
+* JFixture https://github.com/FlexTradeUKLtd/jfixture
 * MockWebServer https://github.com/square/okhttp/tree/master/mockwebserver
