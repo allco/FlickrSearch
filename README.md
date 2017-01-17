@@ -1,22 +1,21 @@
 # FlickrSearch
 A simple Flickr browser.
-This is an example of Android application based on MVP architecture and example os some techniques for automated testing (final tests coverage is insufficient for real applications).
+This is an example of Android application based on MVP architecture and example of some automated testing techniques (final tests coverage is insufficient for real applications).
 
-FlickrSearch takes your search request and asks Flickr for public photos relevant to that request and shows the result in ListView.
-Each ListView's item can be clicked to open in dedicated Activity with title and photo (Flickr didn't provide description).
+FlickrSearch takes your search request and asks Flickr for public photos relevant to the request and shows the result in a ListView.
 
 Cache
 -----
-Disk cache for network responses is used in this application.
+Network responses are cached in this application.
 Every time when a search request is given, the Cache is checked for stored responses with URL as a key.
-If stored response exists then it will be used and no network transmission happened.
+If the stored response exists then it will be used and no network transmission happens.
 
 If "Refresh" button is pressed then the Cache won't be used.
 The expiration time for responses in the Cache for online mode is stored at RestClient.CACHE_EXPIRATION_TIME (1 hour by default).
 
 The **offline mode** (when Internet connection is unavailable) is supported.
-Stored responses will be used if they exists else a error message will appear.
-The expiration time for offline mode is stored at RestClient.CACHE_STALE_TOLERANCE (1 day by default).
+If cached response is available then it will be used in order to show the result.
+The expiration time for the offline mode is stored at RestClient.CACHE_STALE_TOLERANCE (1 day by default).
 
 -----
 
